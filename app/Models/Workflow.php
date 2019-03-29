@@ -9,9 +9,18 @@ class Workflow extends Model
     //
     protected $table = 'workflow';
 
-     public function Node(){
+    protected $fillable = [ 'workflow_name',
+                            'active',
+                            'workflow_template_id'
+                            ];
+
+    public function Node(){
 		return $this->hasMany('App\Models\Node');
 	}
+
+    public function WorkflowNote(){
+        return $this->hasMany('App\Models\WorkflowNote');
+    }
 
     public function WorkflowEditLog(){
 		return $this->hasMany('App\Models\WorkflowEditLog');

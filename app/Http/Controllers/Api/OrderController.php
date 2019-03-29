@@ -188,42 +188,42 @@ class OrderController extends Controller
     {
 
         echo "{'success':true}";
-        // //小程序请求此用户的所有订单
-        // $token = Input::get('token');
-        // $token = Token::where('token', $token)->orderBy('created_at')->first();
-        // $employee = Employee::where('openid', $token->openid)->first();
+        //小程序请求此用户的所有订单
+        $token = Input::get('token');
+        $token = Token::where('token', $token)->orderBy('created_at')->first();
+        $employee = Employee::where('openid', $token->openid)->first();
 
 
-        // $orders=Order::where('user_id',$employee -> id)->get();
-
-
-
+        $orders=Order::where('user_id',$employee -> id)->get();
 
 
 
 
-        // //若order为null ,将此order提出数组
-        // $orders=$orders->reject(function($order)
-        // {
-        //     return $order==null;
-        // });
 
-        // $orders=$orders->filter(function($order){
-        //     $fromDate = Carbon::now()->subWeeks(2); // or ->format(..)
-        //     return $order->created_at>=$fromDate;
-        // });
 
-        // //将ordrs按照创建时间的降序排列
-        // $orders=$orders->sortBy(function($order)
-        // {
-        //     return $order->created_at;
-        // })->reverse();
 
-        // $ordersToArray=$orders->map(function($order){
-        //     return collect($order->toArray())->only(['id','usetime','passenger','mobilephone','reason','state','origin','destination','selected'])->all();
-        // });
-        // //$ordersToJson=$ordersToArray->toJson();
-        // return json_encode($ordersToArray);
+        //若order为null ,将此order提出数组
+        $orders=$orders->reject(function($order)
+        {
+            return $order==null;
+        });
+
+        $orders=$orders->filter(function($order){
+            $fromDate = Carbon::now()->subWeeks(2); // or ->format(..)
+            return $order->created_at>=$fromDate;
+        });
+
+        //将ordrs按照创建时间的降序排列
+        $orders=$orders->sortBy(function($order)
+        {
+            return $order->created_at;
+        })->reverse();
+
+        $ordersToArray=$orders->map(function($order){
+            return collect($order->toArray())->only(['id','usetime','passenger','mobilephone','reason','state','origin','destination','selected'])->all();
+        });
+        //$ordersToJson=$ordersToArray->toJson();
+        return json_encode($ordersToArray);
     }
 
     /**

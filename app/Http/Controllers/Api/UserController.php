@@ -13,9 +13,13 @@ use App\Http\Controllers\Controller;
 use App\Models\UserInfo;
 use App\Models\Token;
 use App\Models\Employee;
+use App\Models\Pvlog;
+use App\Models\Pvstate;
+use App\Models\Program;
+use App\Models\ProgramTeamRole;
 
 
-// 50008:非法的token; 50012:其他客户端登录了;  50014:Token 过期了;
+
 //token: 0  success
 //       1  false
 class UserController extends Controller
@@ -57,68 +61,10 @@ class UserController extends Controller
         return json_encode($ret);
 
 
-        // $code = Input::get('code');
-        // //$ret = array('success'=>true, 'token'=>$code, 'role'=>'noauth');
-        // //$ret = array('success'=>false, 'msg'=>'请求参数错误', 'role'=>'noauth');
-        // $jssdk = new JSSDK(config('yueche.AppID'), config('yueche.AppSecret'));
-        // $data = $jssdk->wxLogin($code);
-
-        // if (isset($data['openid'])){
-        //     $token = new Token;
-        //     $token->token = md5(uniqid().$data['openid'].$data['session_key']);
-        //     $token->openid = $data['openid'];
-        //     $token->session_key = $data['session_key'];
-
-        //     $ret = array('success'=>true, 'token'=>$token->token, 'role'=>'noauth','name'=>'null','mobilephone'=>'null','depart_id'=>0);
-        //     $employee = Employee::where('openid', $data['openid'])->first();
-        //     if ($employee) {
-        //         $ret['name'] = $employee->name;
-        //         $ret['mobilephone'] = $employee->mobilephone;
-        //         $ret['depart_id'] = $employee->depart_id;
-        //         if ($employee->admin) {
-        //             $ret['role'] = 'admin';
-        //             $token->role = 'admin';
-        //         }
-        //         else {
-        //             $ret['role'] = 'employee';
-        //             $token->role = 'employee';
-        //         }
-        //         if($employee->privileges){
-        //             $ret['privileges']=1;
-        //         }else{
-        //             $ret['privileges']=0;
-        //         }
-        //         if($employee->second_privileges){
-        //             $ret['second_privileges']=1;
-        //         }else{
-        //             $ret['second_privileges']=0;
-        //         }
-        //         $ret['id']=$employee->id;
-        //     }
-        //     else {
-        //         $company = Company::where('openid', $data['openid'])->first();
-        //         if ($company) {
-        //             $ret['name'] = $company->name;
-        //             $ret['role'] = 'company';
-        //             $token->role = 'company';
-        //         }
-        //         else {
-        //             $ret['name'] = 'client';
-        //             $ret['role'] = 'noprivilege';
-        //             $token->role = 'noprivilege';
-        //         }
-        //     }
-        //     $token->save();
-
-        // }
-        // else {
-        //     $ret['success'] = false;
-        // }
-        // return json_encode($ret);
     }
 
     public function getInfo(){
-        $ret = array('success'=>0, 'note'=>null,'roles'=>null,'name'=>'' );
+        $ret = array('success'=>0, 'note'=>null,'roles'=>null,'name'=>'' ,'noticeNum'=>null);
 
         $token = Input::get('token');
         $employee  =Token::where('token', $token)->first()->Employee;
@@ -135,6 +81,27 @@ class UserController extends Controller
                                        $employee->is_tester,          
                                        $employee->is_admin);
                             }
+        $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
+        $noDuplicates = array();
+        foreach ($programTeamRoles as $v) {
+            if (isset($noDuplicates[$v['program_id']])) {
+                continue;
+            }
+            $noDuplicates[$v['program_id']] = $v;
+        }
+        $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
+        $noticeNum=0;
+        foreach($ProgramTeamRoleNoDuplicates as $member){
+            $program = $member->Program;
+            $pvstate =Pvstate::where('program_id',$program->id)->where('employee_id',$employee->id)->first();
+            $is_read= $pvstate->is_read;
+            if($is_read==1) continue;
+            $pvlogs  = Pvlog::where('program_id',$program->id)
+                            ->where('changer_id','!=',$employee->id)
+                            ->where('updated_at','>=',$pvstate->updated_at)->get();
+            $noticeNum=$noticeNum+sizeof($pvlogs);
+        }
+        $ret['noticeNum']=$noticeNum;
         return json_encode($ret);
 
 

@@ -14,4 +14,19 @@ class Employee extends Model
     public function Token(){
     	return $this->hasOne('App\Models\Token','employee_id','id');
     }
+    public function CreatedProgram(){
+    	return $this->hasMany('App\Models\Program','creator_id','id');
+    }
+    public function Pvstate(){
+        return $this->hasMany('App\Models\Pvstate','employee_id','id');
+    }
+    public function Pvlog(){
+        return $this->hasMany('App\Models\Pvlog','changer_id','id');
+    }
+    public function WorkflowNote(){
+        return $this->hasMany('App\Models\WorkflowNote');
+    }
+    public function ProgramNote(){
+        return $this->hasMany('App\Models\ProgramNote','employee_id','id');
+    }
 }

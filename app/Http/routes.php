@@ -14,10 +14,29 @@
 Route::get('/', function () {
     return view('welcome');
 });
+//Route::options('/{any}', function(){ return ''; })->where('any', '.*');
 
-Route::group(['middleware' => ['cors','weixin']], function () {
+
+Route::group(['middleware' => ['weixin']], function () {
     Route::get('/api/employee/getInfo','Api\UserController@getInfo');
 
+
+    Route::resource('/management/program', 'Api\ProgramEditController');
+    Route::resource('/employee', 'Api\EmployeeController');
+    Route::resource('/softwareinfo', 'Api\SoftwareInfoController');
+    Route::resource('/programteamrole', 'Api\ProgramTeamRoleController');
+    Route::resource('/programteamrolenote', 'Api\ProgramTeamRoleNoteController');
+    Route::resource('/program', 'Api\ProgramController');
+    Route::resource('/pvlog', 'Api\PvlogController');
+    Route::resource('/workflow', 'Api\WorkflowController');
+    Route::resource('/workflownote', 'Api\WorkflowNoteController');
+    Route::resource('/dailynote', 'Api\DailyNoteController');
+    Route::resource('/delayapply', 'Api\DelayApplyController');
+    Route::resource('/programnote', 'Api\ProgramNoteController');
+
+
+
+    //workfow end
 
     //Route::get('api/')
 

@@ -15,18 +15,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 
 
-use App\Libraries\JSSDK;
-use App\Models\Accept_log;
-use App\Models\DestinationOfOrders;
-use App\Models\Approve_log;
-use App\Models\PerformanceUse;
+
 
 use Illuminate\Database\Eloquent\Collection;
-
-
-
-
-
 
 
 
@@ -37,9 +28,40 @@ class EmployeeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null );
+
+        $listQuery=$request->all();
+        if(array_key_exists('checkPM',$listQuery)&&$listQuery['checkPM']!=''){
+            $employees=Employee::where('is_p_principal','1')->get();
+            $employeesToArray=$employees->map(function($employee){
+            return collect($employee->toArray())->only(['id','name'])->all();
+        });
+
+        $ret['items']=$employeesToArray;
+        $ret['total']=sizeof($employeesToArray);
+
+        return json_encode($ret);
+
+        
+        }
+
+        $employees=Employee::all();
+
+        $employees=$employees->sortBy(function($employee)
+        {
+            return $employee->id;
+        });
+
+        $employeesToArray=$employees->map(function($employee){
+            return collect($employee->toArray())->only(['id','name'])->all();
+        });
+
+        $ret['items']=$employeesToArray;
+        $ret['total']=sizeof($employeesToArray);
+
+        return json_encode($ret);
     }
 
     /**

@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use App\Models\Token;
 use Illuminate\Support\Facades\Input;
 use App\Models\Order;
 use App\Models\OtherInfoOfOrder;
@@ -31,31 +30,13 @@ class WeixinMiddleware
         
 
 
-        //original code start
-        // $key = config('app.key');
-        // $token = Input::get('token');
-        // $t = Input::get('t');
-        // $s = Input::get('s');
-        // $curtime = time();
-
-
-        // //echo Token::where('token', $token)->where('updated_at', '>', $curtime-7200)->count();
-        // if (!empty($token) && !empty($t) && !empty($s) && $curtime-$t < 300 && sha1($key.$t) == $s
-        //     && Token::where('token', $token)->where('updated_at', '>', $curtime-7200)->count() > 0) {
-        //     return $next($request);
-        // }
-        // else {
-        //     return $next($request);
-        //     echo "{'success':false}";
-        // }
-        //original code end
-
-        $key = config('app.key');
-        $token = Input::get('token');
-        $t = Input::get('t');
-        $s = Input::get('s');
+        $key = config('rjz.AppSecret');
+        $t = $request->header('Time');
+        $s = $request->header('Sha');
         $curtime = time();
-                //echo Token::where('token', $token)->where('updated_at', '>', $curtime-7200)->count();
+        
+
+
         if (!empty($token) && !empty($t) && !empty($s) && $curtime-$t < 300 && sha1($key.$t) == $s) {
             echo "{'success':true}";
             return $next($request);
@@ -64,6 +45,7 @@ class WeixinMiddleware
         else {
             return $next($request);
             echo "{'success':false}";
+
         }
     }
 }

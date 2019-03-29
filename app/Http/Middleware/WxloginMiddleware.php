@@ -16,10 +16,11 @@ class WxloginMiddleware
      */
     public function handle($request, Closure $next)
     {
-
         $key = config('rjz.AppSecret');
-        $t = Input::get('t');
-        $s = Input::get('s');
+        //$value = $request->Header('AdminToken');
+        $t = $request->header('Time');
+        $s = $request->header('Sha');
+
         $curtime = time();
 
         if (!empty($t) && !empty($s) && $curtime-$t < 300 && sha1($key.$t) == $s) {
