@@ -94,6 +94,7 @@ class UserController extends Controller
         foreach($ProgramTeamRoleNoDuplicates as $member){
             $program = $member->Program;
             $pvstate =Pvstate::where('program_id',$program->id)->where('employee_id',$employee->id)->first();
+            if($pvstate==null) continue;
             $is_read= $pvstate->is_read;
             if($is_read==1) continue;
             $pvlogs  = Pvlog::where('program_id',$program->id)

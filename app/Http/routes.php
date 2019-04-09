@@ -22,6 +22,9 @@ Route::group(['middleware' => ['weixin']], function () {
 
 
     Route::resource('/management/program', 'Api\ProgramEditController');
+    Route::resource('/pre/program', 'Api\PreProgramEditController');
+    Route::get('/pre/program/preshow', 'Api\PreProgramEditController@preshow');
+    
     Route::resource('/employee', 'Api\EmployeeController');
     Route::resource('/softwareinfo', 'Api\SoftwareInfoController');
     Route::resource('/programteamrole', 'Api\ProgramTeamRoleController');
@@ -33,7 +36,7 @@ Route::group(['middleware' => ['weixin']], function () {
     Route::resource('/dailynote', 'Api\DailyNoteController');
     Route::resource('/delayapply', 'Api\DelayApplyController');
     Route::resource('/programnote', 'Api\ProgramNoteController');
-
+    Route::resource('/contact', 'Api\ContactController');
 
 
     //workfow end

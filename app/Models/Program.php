@@ -51,7 +51,7 @@ class Program extends Model
     }
     public function Contact()
     {
-        return $this->belongsToMany('App\Models\Contact');
+        return $this->hasMany('App\Models\Contact','program_id','id');
     }
     public function Creator()
     {
