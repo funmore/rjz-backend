@@ -15,7 +15,7 @@ class DailyNote extends Model
                             'output'
                         ];
 
-    public function ProgramTeamRoleNote(){
-        return $this->belongsTo('App\Models\ProgramTeamRoleNote','ptr_note_id','id');
+    public function ProgramTeamRoleTask(){
+        return $this->belongsTo('App\Models\ProgramTeamRoleTask','ptr_note_id','id');
     }
 }

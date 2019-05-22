@@ -28,7 +28,7 @@ Route::group(['middleware' => ['weixin']], function () {
     Route::resource('/employee', 'Api\EmployeeController');
     Route::resource('/softwareinfo', 'Api\SoftwareInfoController');
     Route::resource('/programteamrole', 'Api\ProgramTeamRoleController');
-    Route::resource('/programteamrolenote', 'Api\ProgramTeamRoleNoteController');
+    Route::resource('/programteamroletask', 'Api\ProgramTeamRoleTaskController');
     Route::resource('/program', 'Api\ProgramController');
     Route::resource('/pvlog', 'Api\PvlogController');
     Route::resource('/workflow', 'Api\WorkflowController');
@@ -37,6 +37,8 @@ Route::group(['middleware' => ['weixin']], function () {
     Route::resource('/delayapply', 'Api\DelayApplyController');
     Route::resource('/programnote', 'Api\ProgramNoteController');
     Route::resource('/contact', 'Api\ContactController');
+    Route::resource('/fileprogram', 'Api\FileProgramController');
+    Route::resource('/filereview', 'Api\FileReviewController');
 
 
     //workfow end

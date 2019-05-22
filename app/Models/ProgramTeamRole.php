@@ -22,8 +22,8 @@ class ProgramTeamRole extends Model
     public function Employee(){
         return $this->belongsTo('App\Models\Employee','employee_id','id');
     }
-    public function ProgramTeamRoleNote(){
-        return $this->hasMany('App\Models\ProgramTeamRoleNote','programteamrole_id','id');
+    public function ProgramTeamRoleTask(){
+        return $this->hasMany('App\Models\ProgramTeamRoleTask','programteamrole_id','id');
     }
 
 }

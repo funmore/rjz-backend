@@ -6,16 +6,21 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+
+use App\Models\UserInfo;
+use App\Models\Token;
+use App\Models\Employee;
 use App\Models\ProgramTeamRole;
-use App\Models\ProgramTeamRoleTask;
+use App\Models\Program;
+use App\Models\ProgramNote;
+use App\Models\SoftwareInfo;
+use App\Models\Workflow;
+use App\Models\Node;
 use App\Models\Pvlog;
 use App\Models\Pvstate;
-use App\Models\Token;
-use App\Models\Node;
-use App\Models\DailyNote;
-use App\Models\Contact;
+use Illuminate\Database\Eloquent\Collection;
 
-class ContactController extends Controller
+class ProgramNoteConroller extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -26,18 +31,30 @@ class ContactController extends Controller
     {
         $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null );
 
-        $listQuery=$request->all();
 
-        $contacts=Contact::where('is_public',(int)filter_var(    ($listQuery['is_public']), FILTER_VALIDATE_BOOLEAN))
-            ->where('is_12s',(int)filter_var(    ($listQuery['is_12s']), FILTER_VALIDATE_BOOLEAN))->get();
-        $contactsToArray=$contacts->map(function($contact){
-            return collect($contact->toArray())->only(['id','organ','type','name','tele'])->all();
-        });
+        $node=Node::find($_REQUEST['id']);
+        $program_notes=$node->ProgramNote;
+        if(sizeof($program_notes)==0) {
+            return json_encode($ret);
+        }
 
+        $program_notesToArray=$program_notes->map(function($program_note){
+            $creator=Employee::find($$program_note->ProgramTeamRole->employee_id)->name;
 
-        $ret['items']=$contactsToArray;
-        $ret['total']=sizeof($contactsToArray);
+             return collect($program_note->toArray())->only([
+                 'id',
+                 'note',
+                 'state',
+                 'is_up',
+                 'done_day',
+                 'created_at',
+                 'updated_at'])
+                  ->put('creator',$creator)
+                  ->all();
+         })->sortBy('created_at');
 
+         $ret['items']=$program_notesToArray;
+         $ret['total']=sizeof($program_notesToArray);
         return json_encode($ret);
     }
 

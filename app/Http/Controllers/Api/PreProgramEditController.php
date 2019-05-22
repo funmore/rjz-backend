@@ -123,6 +123,10 @@ class PreProgramEditController extends Controller
                  $create_step[3]='工作流配置';
                  $create_step[4]='项目组配置';
              }
+             $managerSelect=Employee::find($program->manager_id);
+             if($managerSelect!=null)
+             $manager = array('id'=>$managerSelect->id, 'name'=>$managerSelect->name );
+
               
              $program=collect($program->toArray())->only([
                  'id',
@@ -141,9 +145,8 @@ class PreProgramEditController extends Controller
                  'program_stage',
                  'dev_type',
                  'state',
-                 'creator_id',
-                 'manager_id'])
-                 ->put('manager_name',Employee::find($program['manager_id'])->name)
+                 'creator_id'])
+                 ->put('manager',$manager)
                  ->put('create_step',$create_step)
                  ->all();
              return $program;
@@ -193,7 +196,7 @@ class PreProgramEditController extends Controller
         $program['program_stage']   = $programBasic['program_stage'];
         $program['dev_type']        = $programBasic['dev_type'];
         $program['creator_id']      = $employee->id;
-        $program['manager_id']      = $programBasic['manager_id'];
+        $program['manager_id']      = $programBasic['manager']['id'];
 
         $program=Program::create($program);
         $program->save();
@@ -386,7 +389,9 @@ class PreProgramEditController extends Controller
                 'tele'])->all();
         });
 
-
+        $managerSelect=Employee::find($program->manager_id);
+         if($managerSelect!=null)
+        $manager = array('id'=>$managerSelect->id, 'name'=>$managerSelect->name );
 
         $programToArray=collect($program->toArray())->only([
                 'id',
@@ -407,8 +412,7 @@ class PreProgramEditController extends Controller
                 'program_type',
                 'classification',
                 'program_stage',
-                'dev_type',
-                'manager_id'])->put('manager_name',Employee::find($program->manager_id)->name)->all();
+                'dev_type'])->put('manager',$manager)->all();
 
 
         $item['programBasic']=$programToArray;
@@ -465,7 +469,7 @@ class PreProgramEditController extends Controller
         $program->program_stage   = $programBasic['program_stage'];
         $program->dev_type        = $programBasic['dev_type'];
         $program->creator_id      = $employee->id;
-        $program->manager_id      = $programBasic['manager_id'];
+        $program->manager_id      = $programBasic['manager']['id'];
 
         $program->save();
 
@@ -550,7 +554,7 @@ class PreProgramEditController extends Controller
 
                 $workflowArray=$member['workflowArray'];
                 foreach($workflowArray as $key=>$workflowNode){
-                    $node=Node::find($workflowNode->id);
+                    $node=Node::find($workflowNode['id']);
                     $node->type=$workflowNode['type'];
                     $node->plan_day=$workflowNode['plan_day'];
                     $node->name=$workflowNode['name'];
@@ -607,6 +611,34 @@ class PreProgramEditController extends Controller
             }
             $program->state='项目进行中';
             $program->save();
+
+
+
+
+            $noDuplicates = array();
+            foreach ($programTeamRoles as $v) {
+                if (isset($noDuplicates[$v['employee_id']])) {
+                    continue;
+                }
+                $noDuplicates[$v['employee_id']] = $v;
+            }
+            $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
+            foreach ($ProgramTeamRoleNoDuplicates as $member) {
+                $pvstate = new Pvstate(array(
+                    'employee_id' => $member['employee_id'],
+                    'is_read' => '0'
+                ));
+                if ($member['employee_id'] == $employee->id) {
+                    $pvstate->is_read = '1';
+                }
+                $program->Pvstate()->save($pvstate);
+            }
+
+
+            $pvlog = new Pvlog(array('changer_id' => $employee->id,
+                'change_note' => '创建了新项目',
+            ));
+            $program->Pvlog()->save($pvlog);
         }
 
         $ret['id']=$program->id;

@@ -57,5 +57,9 @@ class Program extends Model
     {
         return $this->belongsTo('App\Models\Employee','creator_id','id');
     }
+    public function FileProgram()
+    {
+        return $this->hasMany('App\Models\FileProgram','program_id','id');
+    }
 
 }

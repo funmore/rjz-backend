@@ -8,7 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\ProgramTeamRole;
 use App\Models\ProgramNote;
-use App\Models\ProgramTeamRoleNote;
+use App\Models\ProgramTeamRoleTask;
 use App\Models\Pvlog;
 use App\Models\Pvstate;
 use App\Models\Token;

@@ -7,14 +7,14 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\ProgramTeamRole;
-use App\Models\ProgramTeamRoleNote;
+use App\Models\ProgramTeamRoleTask;
 use App\Models\Pvlog;
 use App\Models\Pvstate;
 use App\Models\Token;
 use App\Models\Node;
 
 
-class ProgramTeamRoleNoteController extends Controller
+class ProgramTeamRoleTaskController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -31,7 +31,7 @@ class ProgramTeamRoleNoteController extends Controller
         $ptr=ProgramTeamRole::find($_REQUEST['id']);
 
 
-        $ptr_notes=$ptr->ProgramTeamRoleNote;
+        $ptr_notes=$ptr->ProgramTeamRoleTask;
         if(sizeof($ptr_notes)==0) {
             return json_encode($ret);
         }
@@ -79,9 +79,9 @@ class ProgramTeamRoleNoteController extends Controller
 
         $postData=$request->all();
 
-        //根据ProgramTeamRole来定制各自的ProgramTeamRoleNote，而不是Employee!  因为Employee 有可能在ProgramTeamRole中重复！
+        //根据ProgramTeamRole来定制各自的ProgramTeamRoleTask，而不是Employee!  因为Employee 有可能在ProgramTeamRole中重复！
         $ptr=ProgramTeamRole::find($postData['programteamrole_id']);
-        $ptr_note = new ProgramTeamRoleNote(array(  'task'      => $postData['task'],
+        $ptr_note = new ProgramTeamRoleTask(array(  'task'      => $postData['task'],
                                                     'before_node_id'=> $postData['before_node_id'],
                                                     'due_day'  => $postData['due_day'],
                                                     'overdue_reason'=>$postData['overdue_reason'],
@@ -90,7 +90,7 @@ class ProgramTeamRoleNoteController extends Controller
                                                     'ratio'=>$postData['ratio'],
                                                     'score'=>$postData['score'],
                                             ));
-        $ptr->ProgramTeamRoleNote()->save($ptr_note);
+        $ptr->ProgramTeamRoleTask()->save($ptr_note);
         $ptr_note=collect($ptr_note->toArray())->only([
              'id',
              'task',
@@ -162,7 +162,7 @@ class ProgramTeamRoleNoteController extends Controller
 
         $postData=$request->all();
 
-        $ptr_note=ProgramTeamRoleNote::find($id);
+        $ptr_note=ProgramTeamRoleTask::find($id);
         $ptr_note->task=$postData['task'];
         $ptr_note->before_node_id=$postData['before_node_id'];
         $ptr_note->due_day=$postData['due_day'];

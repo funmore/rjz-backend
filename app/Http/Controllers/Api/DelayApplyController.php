@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\ProgramTeamRole;
-use App\Models\ProgramTeamRoleNote;
+use App\Models\ProgramTeamRoleTask;
 use App\Models\Pvlog;
 use App\Models\Pvstate;
 use App\Models\Token;
@@ -27,7 +27,7 @@ class DelayApplyController extends Controller
     {
         $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null );
 
-        $ptr_note=ProgramTeamRoleNote::find($_REQUEST['id']);
+        $ptr_note=ProgramTeamRoleTask::find($_REQUEST['id']);
         $delay_applys=$ptr_note->DelayApply;
         if(sizeof($delay_applys)==0) {
             return json_encode($ret);
@@ -70,7 +70,7 @@ class DelayApplyController extends Controller
         $postData=$request->all();
 
         //根据ProgramTeamRole来定制各自的ProgramTeamRoleNote，而不是Employee!  因为Employee 有可能在ProgramTeamRole中重复！
-        $ptr_note=ProgramTeamRoleNote::find($postData['ptrNoteId']);
+        $ptr_note=ProgramTeamRoleTask::find($postData['ptrNoteId']);
         $delay_apply = new DelayApply(array(        'delay_day'      => $postData['delay_day'],
                                                     'delay_reason'=> $postData['delay_reason'],
                                                     'is_approved'  => '待处理'
@@ -147,7 +147,7 @@ class DelayApplyController extends Controller
         $delay_apply->is_approved=$postData['is_approved'];
         $delay_apply->save();
 
-        $program=$delay_apply->ProgramTeamRoleNote->ProgramTeamRole->Program;
+        $program=$delay_apply->ProgramTeamRoleTask->ProgramTeamRole->Program;
         $token = $request->header('AdminToken');
         $employee =Token::where('token',$token)->first()->Employee;
         $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();

@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProgramTeamRoleNote extends Model
+class ProgramTeamRoleTask extends Model
 {
     //
-    protected $table = 'programteamrole_note';
+    protected $table = 'programteamrole_task';
 
     protected $fillable = [ 'before_node_id',
                             'task',
