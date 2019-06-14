@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\UserInfo;
+use App\Models\Team;
 use App\Models\Token;
 use Faker\Provider\Company;
 use GuzzleHttp\Psr7\Response;
@@ -96,6 +97,28 @@ class EmployeeController extends Controller
                      'is_admin'])
                       ->put('username',$username)
                       ->put('password',$password)->all();
+            });
+        }
+
+         //查找所有员工的复杂逻辑   用于打开员工管理页面使用
+        if(array_key_exists('checkForSelect',$listQuery)&&filter_var($listQuery['checkForSelect'], FILTER_VALIDATE_BOOLEAN)==true) {
+            $employees=Employee::all();
+
+            $employees=$employees->sortBy(function($employee)
+            {
+                return $employee->id;
+            });
+
+            $employeesToArray=$employees->map(function($employee){
+
+                $team['name']=Team::find($employee->team_id)->name;
+                $team['id']=$employee->team_id;
+                return collect($employee->toArray())->only([
+                     'id',
+                     'name',
+                     'team_id'
+                     ])
+                      ->put('team',$team)->all();
             });
         }
 

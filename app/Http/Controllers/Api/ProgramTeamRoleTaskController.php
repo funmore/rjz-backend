@@ -12,6 +12,7 @@ use App\Models\Pvlog;
 use App\Models\Pvstate;
 use App\Models\Token;
 use App\Models\Node;
+use Illuminate\Database\Eloquent\Collection;
 
 
 class ProgramTeamRoleTaskController extends Controller
@@ -23,37 +24,66 @@ class ProgramTeamRoleTaskController extends Controller
      */
     public function index(Request $request)
     {
-        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null );
+        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>array() );
 
         $token = $request->header('AdminToken');
         $employee =Token::where('token',$token)->first()->Employee;
-        
-        $ptr=ProgramTeamRole::find($_REQUEST['id']);
+        $listQuery=$request->all();
 
+        if(filter_var($listQuery['isOne'], FILTER_VALIDATE_BOOLEAN)==true){
+            $ptr=ProgramTeamRole::find($_REQUEST['id']);
+            $ptr_notes=$ptr->ProgramTeamRoleTask;
+            if(sizeof($ptr_notes)==0) {
+                return json_encode($ret);
+            }
 
-        $ptr_notes=$ptr->ProgramTeamRoleTask;
-        if(sizeof($ptr_notes)==0) {
+            $ptr_notesToArray=$ptr_notes->map(function($ptr_note){
+                return collect($ptr_note->toArray())->only([
+                    'id',
+                    'task',
+                    'before_node_id',
+                    'due_day',
+                    'overdue_reason',
+                    'state',
+                    'note',
+                    'ratio',
+                    'score',
+                    'created_at',
+                    'updated_at'])->put('before_node_name',Node::find($ptr_note->before_node_id)->name)->all();
+            })->sortBy('updated_at')->reverse();
+
+            $ret['items']=$ptr_notesToArray;
+            $ret['total']=sizeof($ptr_notesToArray);
+            return json_encode($ret);
+        }else{
+            foreach($listQuery['id'] as $id){
+                $ptr=ProgramTeamRole::find($id);
+                $ptr_notes=$ptr->ProgramTeamRoleTask;
+                if(sizeof($ptr_notes)==0) {
+                    continue;
+                }
+
+                $ptr_notesToArray=$ptr_notes->map(function($ptr_note){
+                    return collect($ptr_note->toArray())->only([
+                        'id',
+                        'task',
+                        'before_node_id',
+                        'due_day',
+                        'overdue_reason',
+                        'state',
+                        'note',
+                        'ratio',
+                        'score',
+                        'created_at',
+                        'updated_at'])->put('before_node_name',Node::find($ptr_note->before_node_id)->name)->all();
+                })->sortBy('updated_at')->reverse()->toArray();
+
+                $ret['items']=array_merge($ret['items'],$ptr_notesToArray);
+                $ret['total']=$ret['total']+sizeof($ptr_notesToArray);
+            }
             return json_encode($ret);
         }
 
-        $ptr_notesToArray=$ptr_notes->map(function($ptr_note){
-             return collect($ptr_note->toArray())->only([
-                 'id',
-                 'task',
-                 'before_node_id',
-                 'due_day',
-                 'overdue_reason',
-                 'state',
-                 'note',
-                 'ratio',
-                 'score',
-                 'created_at',
-                 'updated_at'])->put('before_node_name',Node::find($ptr_note->before_node_id)->name)->all();
-         })->sortBy('updated_at')->reverse();
-
-         $ret['items']=$ptr_notesToArray;
-         $ret['total']=sizeof($ptr_notesToArray);
-        return json_encode($ret);
 
     }
 
@@ -135,7 +165,36 @@ class ProgramTeamRoleTaskController extends Controller
 
     public function show($id)
     {
-        //
+        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null );
+
+
+
+        $ptr=ProgramTeamRole::find($id);
+
+
+        $ptr_notes=$ptr->ProgramTeamRoleTask;
+        if(sizeof($ptr_notes)==0) {
+            return json_encode($ret);
+        }
+
+        $ptr_notesToArray=$ptr_notes->map(function($ptr_note){
+            return collect($ptr_note->toArray())->only([
+                'id',
+                'task',
+                'before_node_id',
+                'due_day',
+                'overdue_reason',
+                'state',
+                'note',
+                'ratio',
+                'score',
+                'created_at',
+                'updated_at'])->put('before_node_name',Node::find($ptr_note->before_node_id)->name)->all();
+        })->sortBy('updated_at')->reverse();
+
+        $ret['items']=$ptr_notesToArray;
+        $ret['total']=sizeof($ptr_notesToArray);
+        return json_encode($ret);
     }
 
     /**
