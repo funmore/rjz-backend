@@ -23,7 +23,7 @@ class Program extends Model
                                 'workflow_id',
                                 'name',
                                 'program_identity',
-                                'model',
+                                'model_id',
                                 'program_type',
                                 'classification',
                                 'program_stage',
@@ -43,8 +43,14 @@ class Program extends Model
     public function Pvlog(){
         return $this->hasMany('App\Models\Pvlog','program_id','id');
     }
+    public function PostProgram(){
+        return $this->hasOne('App\Models\PostProgram','program_id','id');
+    }
     public function Workflow(){
         return $this->belongsTo('App\Models\Workflow','workflow_id','id');
+    }
+    public function Model(){
+        return $this->belongsTo('App\Models\FlightModel','model_id','id');
     }
     public function Contract(){
         return $this->belongsTo('App\Models\Contract','contract_id','id');

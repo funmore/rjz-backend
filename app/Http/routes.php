@@ -42,6 +42,8 @@ Route::group(['middleware' => ['weixin']], function () {
     Route::resource('/statistic/people', 'Api\StatisticPeopleController');
     Route::resource('/poll', 'Api\PollController');
     Route::resource('/pollfill', 'Api\PollFillController');
+    Route::resource('/model', 'Api\ModelController');
+    Route::resource('/BatchImport', 'Api\BatchImportController');
     //Route::get('/statistic/people/task', 'Api\StatisticPeopleController@taskDetail');
 
 

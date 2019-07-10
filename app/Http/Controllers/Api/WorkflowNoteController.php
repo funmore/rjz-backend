@@ -13,6 +13,8 @@ use App\Models\Token;
 use App\Models\WorkflowNote;
 use App\Models\Node;
 use App\Models\Employee;
+use App\Libraries\PV;
+
 
 class WorkflowNoteController extends Controller
 {
@@ -89,18 +91,22 @@ class WorkflowNoteController extends Controller
 
 
         $program=$workflow->Program;
-        $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
-        if(sizeof($pvstates)!=0) {
-            foreach ($pvstates as $pvstate) {
-                $pvstate->is_read = 0;
-                $pvstate->save();
-            }
-        }
 
-        $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
-            'change_note'=> '工作流变更'
-        ));
-        $program->Pvlog()->save($pvlog);
+        $pv = new PV();
+        $pv->storePvlog($program,$employee,'工作流变更');
+
+        // $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
+        // if(sizeof($pvstates)!=0) {
+        //     foreach ($pvstates as $pvstate) {
+        //         $pvstate->is_read = 0;
+        //         $pvstate->save();
+        //     }
+        // }
+
+        // $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
+        //     'change_note'=> '工作流变更'
+        // ));
+        // $program->Pvlog()->save($pvlog);
 
         $workflow_note=collect($workflow_note->toArray())->only([
                 'id',

@@ -70,17 +70,56 @@ class UserController extends Controller
         $employee  =Token::where('token', $token)->first()->Employee;
         if($employee!=null){
                 $ret['name']=$employee->name;
-                $ret['roles']=array($employee->is_director,$employee->is_v_director,      
-                                       $employee->is_chiefdesigner,   
-                                       $employee->is_v_chiefdesigner,
-                                       $employee->is_p_leader,        
-                                       $employee->is_p_principal,     
-                                       $employee->is_qa,              
-                                       $employee->is_cm,              
-                                       $employee->is_bd,             
-                                       $employee->is_tester,          
-                                       $employee->is_admin);
-                            }
+                $ret['roles']=array();
+                if($employee->is_director==1){
+                    array_push($ret['roles'], '主任');
+                }
+                if($employee->is_director==1){
+                    array_push($ret['roles'], '副主任');
+                }
+                if($employee->is_v_director==1){
+                    array_push($ret['roles'], '主任');
+                }
+                if($employee->is_chiefdesigner==1){
+                    array_push($ret['roles'], '主任设计师');
+                }
+                if($employee->is_v_chiefdesigner==1){
+                    array_push($ret['roles'], '副主任设计师');
+                }
+                if($employee->is_p_leader==1){
+                    array_push($ret['roles'], '项目组长');
+                }
+                if($employee->is_p_principal==1){
+                    array_push($ret['roles'], '型号负责人');
+                }
+                if($employee->is_qa==1){
+                    array_push($ret['roles'], '质量保证人员');
+                }
+                if($employee->is_cm==1){
+                    array_push($ret['roles'], '配置管理人员');
+                }
+                if($employee->is_bd==1){
+                    array_push($ret['roles'], '市场人员');
+                }
+                if($employee->is_tester==1){
+                    array_push($ret['roles'], '测试人员');
+                }
+                if($employee->is_admin==1){
+                    array_push($ret['roles'], '管理员');
+                }
+        }
+                // $ret['roles']=array(   $employee->is_director==1?'主任':'1',
+                //                        $employee->is_v_director==1?'副主任':'1',      
+                //                        $employee->is_chiefdesigner==1?'主任设计师':'1',   
+                //                        $employee->is_v_chiefdesigner==1?'副主任设计师':'1',
+                //                        $employee->is_p_leader==1?'项目组长':'1',        
+                //                        $employee->is_p_principal==1?'型号负责人':'1',     
+                //                        $employee->is_qa==1?'质量保证人员':'1',              
+                //                        $employee->is_cm==1?'配置管理人员':'1',              
+                //                        $employee->is_bd==1?'市场人员':'1',             
+                //                        $employee->is_tester==1?'is_tester':'1',          
+                //                        $employee->is_admin==1?'管理员':'1');
+                //             }
         $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
         $noDuplicates = array();
         foreach ($programTeamRoles as $v) {

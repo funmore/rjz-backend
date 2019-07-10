@@ -16,6 +16,8 @@ use App\Models\Node;
 use App\Models\DailyNote;
 use App\Models\DelayApply;
 use App\Models\Employee;
+use App\Libraries\PV;
+
 
 class ProgramNoteController extends Controller
 {
@@ -27,31 +29,34 @@ class ProgramNoteController extends Controller
     public function index(Request $request)
     {
         $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null );
+        $listQuery=$request->all();
+        if(array_key_exists('id',$listQuery)&&$listQuery['id']!=null){
+                $node=Node::find($_REQUEST['id']);
 
-        
-        $node=Node::find($_REQUEST['id']);
 
+                $p_notes=$node->ProgramNote;
+                if(sizeof($p_notes)==0) {
+                    return json_encode($ret);
+                }
 
-        $p_notes=$node->ProgramNote;
-        if(sizeof($p_notes)==0) {
-            return json_encode($ret);
-        }
+                $p_notesToArray=$p_notes->map(function($p_note){
+                    $creator=$p_note->Employee->name;
+                     return collect($p_note->toArray())->only([
+                         'id',
+                         'is_up',
+                         'done_day',
+                         'state',
+                         'note',
+                         'created_at',
+                         'updated_at'])->put('creator',$creator)->all();
+                 })->sortBy('updated_at')->reverse();
 
-        $p_notesToArray=$p_notes->map(function($p_note){
-            $creator=$p_note->Employee->name;
-             return collect($p_note->toArray())->only([
-                 'id',
-                 'is_up',
-                 'done_day',
-                 'state',
-                 'note',
-                 'created_at',
-                 'updated_at'])->put('creator',$creator)->all();
-         })->sortBy('updated_at')->reverse();
-
-         $ret['items']=$p_notesToArray;
-         $ret['total']=sizeof($p_notesToArray);
-        return json_encode($ret);
+                 $ret['items']=$p_notesToArray;
+                 $ret['total']=sizeof($p_notesToArray);
+                return json_encode($ret);
+            }else{
+                return json_encode($ret);
+            }
 
     }
 
@@ -98,19 +103,20 @@ class ProgramNoteController extends Controller
 
         $program=$node->Workflow->Program;
 
+        $pv = new PV();
+        $pv->storePvlog($program,$employee,'新增项目待解决事项');
 
-
-        $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
-        if(sizeof($pvstates)!=0) {
-            foreach ($pvstates as $pvstate) {
-                $pvstate->is_read = 0;
-                $pvstate->save();
-            }
-        }
-        $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
-                                  'change_note'=> '新增项目待解决事项'
-        ));
-        $program->Pvlog()->save($pvlog);
+        // $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
+        // if(sizeof($pvstates)!=0) {
+        //     foreach ($pvstates as $pvstate) {
+        //         $pvstate->is_read = 0;
+        //         $pvstate->save();
+        //     }
+        // }
+        // $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
+        //                           'change_note'=> '新增项目待解决事项'
+        // ));
+        // $program->Pvlog()->save($pvlog);
 
         return json_encode($ret);
     }
@@ -160,18 +166,21 @@ class ProgramNoteController extends Controller
         $token = $request->header('AdminToken');
         $employee =Token::where('token',$token)->first()->Employee;
 
-        $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
-        if(sizeof($pvstates)!=0) {
-            foreach ($pvstates as $pvstate) {
-                $pvstate->is_read = 0;
-                $pvstate->save();
-            }
-        }
+        $pv = new PV();
+        $pv->storePvlog($program,$employee,'更新待解决问题');
         
-        $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
-                                  'change_note'=> '更新待解决问题'
-        ));
-        $program->Pvlog()->save($pvlog);
+        // $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
+        // if(sizeof($pvstates)!=0) {
+        //     foreach ($pvstates as $pvstate) {
+        //         $pvstate->is_read = 0;
+        //         $pvstate->save();
+        //     }
+        // }
+        
+        // $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
+        //                           'change_note'=> '更新待解决问题'
+        // ));
+        // $program->Pvlog()->save($pvlog);
 
         return json_encode($ret);
     }

@@ -13,6 +13,8 @@ use App\Models\Pvstate;
 use App\Models\Token;
 use App\Models\Node;
 use Illuminate\Database\Eloquent\Collection;
+use App\Libraries\PV;
+
 
 
 class ProgramTeamRoleTaskController extends Controller
@@ -140,18 +142,21 @@ class ProgramTeamRoleTaskController extends Controller
         $token = $request->header('AdminToken');
         $employee =Token::where('token',$token)->first()->Employee;
 
-        $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
-        if(sizeof($pvstates)!=0) {
-            foreach ($pvstates as $pvstate) {
-                $pvstate->is_read = 0;
-                $pvstate->save();
-            }
-        }
+        $pv = new PV();
+        $pv->storePvlog($program,$employee,'新增任务');
 
-        $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
-                                  'change_note'=> '新增任务'
-        ));
-        $program->Pvlog()->save($pvlog);
+        // $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
+        // if(sizeof($pvstates)!=0) {
+        //     foreach ($pvstates as $pvstate) {
+        //         $pvstate->is_read = 0;
+        //         $pvstate->save();
+        //     }
+        // }
+
+        // $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
+        //                           'change_note'=> '新增任务'
+        // ));
+        // $program->Pvlog()->save($pvlog);
 
         return json_encode($ret);
     }
@@ -236,17 +241,20 @@ class ProgramTeamRoleTaskController extends Controller
         $token = $request->header('AdminToken');
         $employee =Token::where('token',$token)->first()->Employee;
         
-        $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
-        if(sizeof($pvstates)!=0) {
-            foreach ($pvstates as $pvstate) {
-                $pvstate->is_read = 0;
-                $pvstate->save();
-            }
-        }
-        $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
-                                  'change_note'=> '修改任务'
-        ));
-        $program->Pvlog()->save($pvlog);
+        $pv = new PV();
+        $pv->storePvlog($program,$employee,'修改任务');
+
+        // $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
+        // if(sizeof($pvstates)!=0) {
+        //     foreach ($pvstates as $pvstate) {
+        //         $pvstate->is_read = 0;
+        //         $pvstate->save();
+        //     }
+        // }
+        // $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
+        //                           'change_note'=> '修改任务'
+        // ));
+        // $program->Pvlog()->save($pvlog);
 
         return json_encode($ret);
     }

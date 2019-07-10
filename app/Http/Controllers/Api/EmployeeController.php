@@ -44,7 +44,7 @@ class EmployeeController extends Controller
 
         }
         //查找所有员工的简单逻辑   用于创建项目时的项目组配置使用
-        if(array_key_exists('checkALL',$listQuery)&&ilter_var($listQuery['checkALL'], FILTER_VALIDATE_BOOLEAN)==true) {
+        if(array_key_exists('checkALL',$listQuery)&&filter_var($listQuery['checkALL'], FILTER_VALIDATE_BOOLEAN)==true) {
             $employees=Employee::all();
 
             $employees=$employees->sortBy(function($employee)

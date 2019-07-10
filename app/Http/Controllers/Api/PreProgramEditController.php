@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use App\Libraries\PV;
 
 
 use App\Models\UserInfo;
@@ -21,6 +22,8 @@ use App\Models\Pvlog;
 use App\Models\Pvstate;
 use App\Models\Contact;
 use Illuminate\Database\Eloquent\Collection;
+use App\Models\FlightModel;
+
 
 class PreProgramEditController extends Controller
 {
@@ -52,8 +55,8 @@ class PreProgramEditController extends Controller
                 $programs=$programs->intersect($programsTitle);
             }
         }
-        if(array_key_exists('model',$listQuery)&&$listQuery['model']!=''){
-            $programsModel = Program::where('model', $listQuery['model'])->get();
+        if(array_key_exists('model_id',$listQuery)&&$listQuery['model_id']!=''){
+            $programsModel = Program::where('model_id', $listQuery['model_id'])->get();
             if($programs->isEmpty()){
                 $programs=$programs->merge($programsModel);
             }else{
@@ -103,7 +106,8 @@ class PreProgramEditController extends Controller
 
         //将programs按照创建时间的降序排列
         $programs=$programs->filter(function($program){
-          return $program->state=='项目预备中';
+          return $program->state=='意向项目'
+               ||$program->state=='预备项目';
         })->sortBy(function($program)
         {
             return $program->created_at;
@@ -123,9 +127,9 @@ class PreProgramEditController extends Controller
                  $create_step[3]='工作流配置';
                  $create_step[4]='项目组配置';
              }
-             $managerSelect=Employee::find($program->manager_id);
-             if($managerSelect!=null)
-             $manager = array('id'=>$managerSelect->id, 'name'=>$managerSelect->name );
+
+
+             $manager=$program->Model==null?null:Employee::find($program->Model->employee_id);
 
               
              $program=collect($program->toArray())->only([
@@ -139,7 +143,7 @@ class PreProgramEditController extends Controller
                  'workflow_id',
                  'name',
                  'program_identity',
-                 'model',
+                 'model_id',
                  'program_type',
                  'classification',
                  'program_stage',
@@ -175,6 +179,11 @@ class PreProgramEditController extends Controller
      */
     public function store(Request $request)
     {
+        //1.programBasic
+        //2.contact
+        //3.softwareInfo
+        //4.workflow
+        //5.programTeamRole
         $ret = array('success'=>0, 'note'=>null,'total'=>0,'id'=>0 );
         $token = $request->header('AdminToken');
         $employee =Token::where('token',$token)->first()->Employee;
@@ -186,11 +195,11 @@ class PreProgramEditController extends Controller
         $program['plan_end_time']   = $programBasic['plan_end_time'];
         $program['name']            = $programBasic['name'];
         $program['type']            = $programBasic['type'];
-        $program['ref']            = $programBasic['ref'];
+        $program['ref']             = $programBasic['ref'];
         $program['program_source']  = $programBasic['program_source'];
-        $program['state']  = '项目进行中';
+        $program['state']           = '首轮测试执行中';
         $program['program_identity']= $programBasic['program_identity'];
-        $program['model']           = $programBasic['model'];
+        $program['model_id']        = $programBasic['model_id'];
         $program['program_type']    = $programBasic['program_type'];
         $program['classification']  = $programBasic['classification'];
         $program['program_stage']   = $programBasic['program_stage'];
@@ -204,100 +213,77 @@ class PreProgramEditController extends Controller
         $contacts=$postData['contact'];
 
         foreach($contacts as $member){
-            $memberRole = new Contact(array(        'is_12s'      => $member['is_12s'],
-                                                    'type'=> $member['type'],
-                                                    'organ'  => $member['organ'],
-                                                    'name'  => $member['name'],
-                                                    'tele'  => $member['tele']
+            $memberRole = new Contact(array(        'is_12s'   => $member['is_12s'],
+                                                    'type'     => $member['type'],
+                                                    'organ'    => $member['organ'],
+                                                    'name'     => $member['name'],
+                                                    'tele'     => $member['tele']
                                                 ));
             $program->Contact()->save($memberRole);
         }
         if(array_key_exists('softwareInfo',$postData)){
             $softInfo=$postData['softwareInfo'];
             foreach($softInfo as $member){
-                $softwareInfo = new SoftwareInfo(array( 'name'      => $member['name'],
-                                                        'version_id'=> $member['version_id'],
-                                                        'complier'  => $member['complier'],
-                                                        'runtime'  => $member['runtime'],
-                                                        'size'     => $member['size'],
-                                                        'reduced_code_size'  => $member['reduced_code_size'],
-                                                        'reduced_reason'  => $member['reduced_reason'],
-                                                        'software_cate'  => $member['software_cate'],
-                                                        'software_sub_cate'  => $member['software_sub_cate'],
-                                                        'cpu_type'  => $member['cpu_type'],
-                                                        'code_langu'  => $member['code_langu'],
-                                                        'software_usage'  => $member['software_usage'],
-                                                        'software_type'  => $member['software_type'],
-                                                        'info_typer_id'   =>$employee->id  
+                $softwareInfo = new SoftwareInfo(array( 'name'             => $member['name'],
+                                                        'version_id'       => $member['version_id'],
+                                                        'complier'         => $member['complier'],
+                                                        'runtime'          => $member['runtime'],
+                                                        'size'             => $member['size'],
+                                                        'reduced_code_size'=> $member['reduced_code_size'],
+                                                        'reduced_reason'   => $member['reduced_reason'],
+                                                        'software_cate'    => $member['software_cate'],
+                                                        'software_sub_cate'=> $member['software_sub_cate'],
+                                                        'cpu_type'         => $member['cpu_type'],
+                                                        'code_langu'       => $member['code_langu'],
+                                                        'software_usage'   => $member['software_usage'],
+                                                        'software_type'    => $member['software_type'],
+                                                        'info_typer_id'    =>$employee->id  
                                                         ));
                 $program->SoftwareInfo()->save($softwareInfo);
             }
-        }else{
-            $program['state']='项目预备中';
-            $program->save();
         }
 
 
-        if(array_key_exists('workflow',$postData)){
-            $workflowInfo=$postData['workflow'];
-            $workflow = Workflow::create([          'workflow_name'  => $workflowInfo['workflow_name'],
-                                                    'active'=>      0,
-                                                    'workflow_template_id'  =>      1
-                                                    ]);
-            $program->Workflow()->associate($workflow);
+            if(array_key_exists('workflow',$postData)){
+                $workflowInfo=$postData['workflow'];
+                $workflow = Workflow::create([          'workflow_name'  => $workflowInfo['workflow_name'],
+                                                        'active'=>      0,
+                                                        'workflow_template_id'  =>      1
+                                                        ]);
+                $program->Workflow()->associate($workflow);
+                $program->save();
+
+
+                $workflowArray=$workflowInfo['workflowArray'];
+
+                foreach($workflowArray as $key=>$workflowNode){
+                    $node = new Node(array(     'workflow_template_id'      => 1,
+                                                'type'=> $workflowNode['type'],
+                                                'plan_day'=> $workflowNode['plan_day'],                                        
+                                                'name'  => $workflowNode['name'],
+                                                'array_index'=>  $key
+                                                ));
+                    $program->Workflow->Node()->save($node);
+                }
+            }
+
+            if(array_key_exists('programTeamRole',$postData)) {
+                $programTeamRoles = $postData['programTeamRole'];
+                foreach ($programTeamRoles as $member) {
+                    $memberRole = new ProgramTeamRole(array('role' => $member['role'],
+                        'workload_note' => $member['workload_note'],
+                        'plan_workload' => $member['plan_workload'],
+                        'actual_workload' => $member['actual_workload'],
+                        'employee_id' => $member['employee_id']
+                    ));
+                    $program->ProgramTeamRole()->save($memberRole);
+                }
+
+            $pv = new PV();
+            $ret['noticeArray']=$pv->storePvState($program,$employee);
+            }else{
+            $program['state']='预备项目';
             $program->save();
-
-
-            $workflowArray=$workflowInfo['workflowArray'];
-
-            foreach($workflowArray as $key=>$workflowNode){
-                $node = new Node(array(     'workflow_template_id'      => 1,
-                                            'type'=> $workflowNode['type'],
-                                            'plan_day'=> $workflowNode['plan_day'],                                        
-                                            'name'  => $workflowNode['name'],
-                                            'array_index'=>  $key
-                                            ));
-                $program->Workflow->Node()->save($node);
-            }
-        }
-
-        if(array_key_exists('programTeamRole',$postData)) {
-            $programTeamRoles = $postData['programTeamRole'];
-            foreach ($programTeamRoles as $member) {
-                $memberRole = new ProgramTeamRole(array('role' => $member['role'],
-                    'workload_note' => $member['workload_note'],
-                    'plan_workload' => $member['plan_workload'],
-                    'actual_workload' => $member['actual_workload'],
-                    'employee_id' => $member['employee_id']
-                ));
-                $program->ProgramTeamRole()->save($memberRole);
-            }
-
-
-            $noDuplicates = array();
-            foreach ($programTeamRoles as $v) {
-                if (isset($noDuplicates[$v['employee_id']])) {
-                    continue;
-                }
-                $noDuplicates[$v['employee_id']] = $v;
-            }
-            $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
-            foreach ($ProgramTeamRoleNoDuplicates as $member) {
-                $pvstate = new Pvstate(array(
-                    'employee_id' => $member['employee_id'],
-                    'is_read' => '0'
-                ));
-                if ($member['employee_id'] == $employee->id) {
-                    $pvstate->is_read = '1';
-                }
-                $program->Pvstate()->save($pvstate);
-            }
-
-
-            $pvlog = new Pvlog(array('changer_id' => $employee->id,
-                'change_note' => '创建了新项目',
-            ));
-            $program->Pvlog()->save($pvlog);
         }
 
 
@@ -408,7 +394,7 @@ class PreProgramEditController extends Controller
                 'workflow_id',
                 'name',
                 'program_identity',
-                'model',
+                'model_id',
                 'program_type',
                 'classification',
                 'program_stage',
@@ -461,9 +447,9 @@ class PreProgramEditController extends Controller
         $program->type            = $programBasic['type'];
         $program->ref            = $programBasic['ref'];
         $program->program_source  = $programBasic['program_source'];
-        $program->state  = '项目预备中';
+        $program->state  = '预备项目';
         $program->program_identity= $programBasic['program_identity'];
-        $program->model           = $programBasic['model'];
+        $program->model_id           = $programBasic['model_id'];
         $program->program_type    = $programBasic['program_type'];
         $program->classification  = $programBasic['classification'];
         $program->program_stage   = $programBasic['program_stage'];
@@ -609,36 +595,37 @@ class PreProgramEditController extends Controller
 
                 }
             }
-            $program->state='项目进行中';
+            $program->state='首轮测试执行中';
             $program->save();
 
 
 
+            $pv = new PV();
+            $ret['noticeArray']=$pv->storePvState($program,$employee);
+            // $noDuplicates = array();
+            // foreach ($programTeamRoles as $v) {
+            //     if (isset($noDuplicates[$v['employee_id']])) {
+            //         continue;
+            //     }
+            //     $noDuplicates[$v['employee_id']] = $v;
+            // }
+            // $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
+            // foreach ($ProgramTeamRoleNoDuplicates as $member) {
+            //     $pvstate = new Pvstate(array(
+            //         'employee_id' => $member['employee_id'],
+            //         'is_read' => '0'
+            //     ));
+            //     if ($member['employee_id'] == $employee->id) {
+            //         $pvstate->is_read = '1';
+            //     }
+            //     $program->Pvstate()->save($pvstate);
+            // }
 
-            $noDuplicates = array();
-            foreach ($programTeamRoles as $v) {
-                if (isset($noDuplicates[$v['employee_id']])) {
-                    continue;
-                }
-                $noDuplicates[$v['employee_id']] = $v;
-            }
-            $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
-            foreach ($ProgramTeamRoleNoDuplicates as $member) {
-                $pvstate = new Pvstate(array(
-                    'employee_id' => $member['employee_id'],
-                    'is_read' => '0'
-                ));
-                if ($member['employee_id'] == $employee->id) {
-                    $pvstate->is_read = '1';
-                }
-                $program->Pvstate()->save($pvstate);
-            }
 
-
-            $pvlog = new Pvlog(array('changer_id' => $employee->id,
-                'change_note' => '创建了新项目',
-            ));
-            $program->Pvlog()->save($pvlog);
+            // $pvlog = new Pvlog(array('changer_id' => $employee->id,
+            //     'change_note' => '创建了新项目',
+            // ));
+            // $program->Pvlog()->save($pvlog);
         }
 
         $ret['id']=$program->id;

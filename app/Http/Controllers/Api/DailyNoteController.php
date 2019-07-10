@@ -13,6 +13,8 @@ use App\Models\Pvstate;
 use App\Models\Token;
 use App\Models\Node;
 use App\Models\DailyNote;
+use App\Libraries\PV;
+
 
 
 
@@ -97,17 +99,20 @@ class DailyNoteController extends Controller
         $employee =Token::where('token',$token)->first()->Employee;
 
 
-        $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
-        if(sizeof($pvstates)!=0) {
-            foreach ($pvstates as $pvstate) {
-                $pvstate->is_read = 0;
-                $pvstate->save();
-            }
-        }
-        $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
-                                  'change_note'=> '新增每日工作日志'
-        ));
-        $program->Pvlog()->save($pvlog);
+        $pv = new PV();
+        $pv->storePvlog($program,$employee,'新增每日工作日志');
+
+        // $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
+        // if(sizeof($pvstates)!=0) {
+        //     foreach ($pvstates as $pvstate) {
+        //         $pvstate->is_read = 0;
+        //         $pvstate->save();
+        //     }
+        // }
+        // $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
+        //                           'change_note'=> '新增每日工作日志'
+        // ));
+        // $program->Pvlog()->save($pvlog);
 
         return json_encode($ret);
     }
@@ -158,18 +163,20 @@ class DailyNoteController extends Controller
         $token = $request->header('AdminToken');
         $employee =Token::where('token',$token)->first()->Employee;
 
-        $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
-        if(sizeof($pvstates)!=0) {
-            foreach ($pvstates as $pvstate) {
-                $pvstate->is_read = 0;
-                $pvstate->save();
-            }
-        }
+        $pv = new PV();
+        $pv->storePvlog($program,$employee,'更新每日工作日志');
+        // $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
+        // if(sizeof($pvstates)!=0) {
+        //     foreach ($pvstates as $pvstate) {
+        //         $pvstate->is_read = 0;
+        //         $pvstate->save();
+        //     }
+        // }
         
-        $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
-                                  'change_note'=> '更新每日工作日志'
-        ));
-        $program->Pvlog()->save($pvlog);
+        // $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
+        //                           'change_note'=> '更新每日工作日志'
+        // ));
+        // $program->Pvlog()->save($pvlog);
 
         return json_encode($ret);
     }
