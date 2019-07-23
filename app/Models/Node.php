@@ -24,7 +24,10 @@ class Node extends Model
     	return $this->belongsTo('App\Models\WorkflowTemplate','workflow_template_id','id');
     }
 
-    public function ProgramNote(){
-        return $this->hasMany('App\Models\ProgramNote','node_id','id');
+    public function NodeNote(){
+        return $this->hasMany('App\Models\NodeNote','node_id','id');
+    }
+    public function ProgramTeamRoleTask(){
+        return $this->hasMany('App\Models\ProgramTeamRoleTask','before_node_id','id');
     }
 }

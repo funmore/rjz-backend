@@ -35,7 +35,7 @@ Route::group(['middleware' => ['weixin']], function () {
     Route::resource('/workflownote', 'Api\WorkflowNoteController');
     Route::resource('/dailynote', 'Api\DailyNoteController');
     Route::resource('/delayapply', 'Api\DelayApplyController');
-    Route::resource('/programnote', 'Api\ProgramNoteController');
+    Route::resource('/nodenote', 'Api\NodeNoteController');
     Route::resource('/contact', 'Api\ContactController');
     Route::resource('/fileprogram', 'Api\FileProgramController');
     Route::resource('/filereview', 'Api\FileReviewController');
@@ -44,8 +44,8 @@ Route::group(['middleware' => ['weixin']], function () {
     Route::resource('/pollfill', 'Api\PollFillController');
     Route::resource('/model', 'Api\ModelController');
     Route::resource('/BatchImport', 'Api\BatchImportController');
-    //Route::get('/statistic/people/task', 'Api\StatisticPeopleController@taskDetail');
-
+    Route::resource('/notestwork', 'Api\NoTestWorkController');
+    Route::resource('/notestworklogmonth', 'Api\NoTestWorkController@month');
 
 
     //workfow end

@@ -107,19 +107,8 @@ class UserController extends Controller
                 if($employee->is_admin==1){
                     array_push($ret['roles'], '管理员');
                 }
+                array_push($ret['roles'], '测试人员');
         }
-                // $ret['roles']=array(   $employee->is_director==1?'主任':'1',
-                //                        $employee->is_v_director==1?'副主任':'1',      
-                //                        $employee->is_chiefdesigner==1?'主任设计师':'1',   
-                //                        $employee->is_v_chiefdesigner==1?'副主任设计师':'1',
-                //                        $employee->is_p_leader==1?'项目组长':'1',        
-                //                        $employee->is_p_principal==1?'型号负责人':'1',     
-                //                        $employee->is_qa==1?'质量保证人员':'1',              
-                //                        $employee->is_cm==1?'配置管理人员':'1',              
-                //                        $employee->is_bd==1?'市场人员':'1',             
-                //                        $employee->is_tester==1?'is_tester':'1',          
-                //                        $employee->is_admin==1?'管理员':'1');
-                //             }
         $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
         $noDuplicates = array();
         foreach ($programTeamRoles as $v) {

@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProgramNote extends Model
+class NodeNote extends Model
 {
         //
-    protected $table = 'program_note';
+    protected $table = 'node_note';
 
     protected $fillable = [ 'employee_id', 
                             'node_id', 

@@ -49,7 +49,7 @@ class Program extends Model
     public function Workflow(){
         return $this->belongsTo('App\Models\Workflow','workflow_id','id');
     }
-    public function Model(){
+    public function FlightModel(){
         return $this->belongsTo('App\Models\FlightModel','model_id','id');
     }
     public function Contract(){

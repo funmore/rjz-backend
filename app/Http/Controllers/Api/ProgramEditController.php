@@ -169,7 +169,7 @@ class ProgramEditController extends Controller
         })->reverse();
 
          $programsToArray=$programs->map(function($program){
-             $manager=$program->Model==null?null:Employee::find($program->Model->employee_id);
+             $manager=$program->FlightModel==null?'':Employee::find($program->FlightModel->employee_id);
              $program_leader=null;
              $program_team_strict=null;
              $workflow_state=null;
@@ -178,7 +178,7 @@ class ProgramEditController extends Controller
                  $node = $program->Workflow->Node->first(function ($key, $value) {
                      return $value->array_index == $value->Workflow->active;
                  });
-                 $programIssue =$node->ProgramNote->filter(function($value){
+                 $programIssue =$node->NodeNote->filter(function($value){
                      return   $value->is_up=='是';
                  })->map(function($item,$key){
                      return $item->note;
@@ -253,137 +253,7 @@ class ProgramEditController extends Controller
      */
     public function store(Request $request)
     {
-        // $ret = array('success'=>0, 'note'=>null,'total'=>0,'id'=>0 );
-        // $token = $request->header('AdminToken');
-        // $employee =Token::where('token',$token)->first()->Employee;
-
-        // $postData=$request->all();
-        // $programBasic=$postData['programBasic'];
-
-        // $program['plan_start_time'] = $programBasic['plan_start_time'];
-        // $program['plan_end_time']   = $programBasic['plan_end_time'];
-        // $program['name']            = $programBasic['name'];
-        // $program['type']            = $programBasic['type'];
-        // $program['ref']            = $programBasic['ref'];
-        // $program['program_source']  = $programBasic['program_source'];
-        // $program['state']  = '项目进行中';
-        // $program['program_identity']= $programBasic['program_identity'];
-        // $program['model_id']           = $programBasic['model_id'];
-        // $program['program_type']    = $programBasic['program_type'];
-        // $program['classification']  = $programBasic['classification'];
-        // $program['program_stage']   = $programBasic['program_stage'];
-        // $program['dev_type']        = $programBasic['dev_type'];
-        // $program['creator_id']      = $employee->id;
-        // $program['manager_id']      = $programBasic['manager_id'];
-
-        // $program=Program::create($program);
-        // $program->save();
-
-        // $contacts=$postData['contact'];
-
-        // foreach($contacts as $member){
-        //     $memberRole = new Contact(array(        'is_12s'      => $member['is_12s'],
-        //                                             'type'=> $member['type'],
-        //                                             'organ'  => $member['organ'],
-        //                                             'name'  => $member['name'],
-        //                                             'tele'  => $member['tele']
-        //                                         ));
-        //     $program->Contact()->save($memberRole);
-        // }
-        // if(array_key_exists('softwareInfo',$postData)){
-        //     $softInfo=$postData['softwareInfo'];
-        //     foreach($softInfo as $member){
-        //         $softwareInfo = new SoftwareInfo(array( 'name'      => $member['name'],
-        //                                                 'version_id'=> $member['version_id'],
-        //                                                 'complier'  => $member['complier'],
-        //                                                 'runtime'  => $member['runtime'],
-        //                                                 'size'     => $member['size'],
-        //                                                 'reduced_code_size'  => $member['reduced_code_size'],
-        //                                                 'reduced_reason'  => $member['reduced_reason'],
-        //                                                 'software_cate'  => $member['software_cate'],
-        //                                                 'software_sub_cate'  => $member['software_sub_cate'],
-        //                                                 'cpu_type'  => $member['cpu_type'],
-        //                                                 'code_langu'  => $member['code_langu'],
-        //                                                 'software_usage'  => $member['software_usage'],
-        //                                                 'software_type'  => $member['software_type'],
-        //                                                 'info_typer_id'   =>$employee->id  
-        //                                                 ));
-        //         $program->SoftwareInfo()->save($softwareInfo);
-        //     }
-        // }else{
-        //     $program['state']='项目预备中';
-        // }
-
-
-        // if(array_key_exists('workflow',$postData)){
-        //     $workflowInfo=$postData['workflow'];
-        //     $workflow = Workflow::create([          'workflow_name'  => $workflowInfo['workflow_name'],
-        //                                             'active'=>      0,
-        //                                             'workflow_template_id'  =>      1
-        //                                             ]);
-        //     $program->Workflow()->associate($workflow);
-        //     $program->save();
-
-
-        //     $workflowArray=$workflowInfo['workflowArray'];
-
-        //     foreach($workflowArray as $key=>$workflowNode){
-        //         $node = new Node(array(     'workflow_template_id'      => 1,
-        //                                     'type'=> $workflowNode['type'],
-        //                                     'plan_day'=> $workflowNode['plan_day'],                                        
-        //                                     'name'  => $workflowNode['name'],
-        //                                     'array_index'=>  $key
-        //                                     ));
-        //         $program->Workflow->Node()->save($node);
-        //     }
-        // }
-
-        // if(array_key_exists('programTeamRole',$postData)) {
-        //     $programTeamRoles = $postData['programTeamRole'];
-        //     foreach ($programTeamRoles as $member) {
-        //         $memberRole = new ProgramTeamRole(array('role' => $member['role'],
-        //             'workload_note' => $member['workload_note'],
-        //             'plan_workload' => $member['plan_workload'],
-        //             'actual_workload' => $member['actual_workload'],
-        //             'employee_id' => $member['employee_id']
-        //         ));
-        //         $program->ProgramTeamRole()->save($memberRole);
-        //     }
-
-
-        //     $noDuplicates = array();
-        //     foreach ($programTeamRoles as $v) {
-        //         if (isset($noDuplicates[$v['employee_id']])) {
-        //             continue;
-        //         }
-        //         $noDuplicates[$v['employee_id']] = $v;
-        //     }
-        //     $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
-        //     foreach ($ProgramTeamRoleNoDuplicates as $member) {
-        //         $pvstate = new Pvstate(array(
-        //             'employee_id' => $member['employee_id'],
-        //             'is_read' => '0'
-        //         ));
-        //         if ($member['employee_id'] == $employee->id) {
-        //             $pvstate->is_read = '1';
-        //         }
-        //         $program->Pvstate()->save($pvstate);
-        //     }
-
-
-        //     $pvlog = new Pvlog(array('changer_id' => $employee->id,
-        //         'change_note' => '创建了新项目',
-        //     ));
-        //     $program->Pvlog()->save($pvlog);
-        // }
-
-
-
-
-
-        // $ret['id']=$program->id;
-        // return json_encode($ret);
-        //return json_encode($request->header('Cookie'));
+        
     }
 
     /**
@@ -397,7 +267,7 @@ class ProgramEditController extends Controller
         $token = $request->header('AdminToken');
         $employee =Token::where('token',$token)->first()->Employee;
 
-        $ret = array('success'=>0, 'note'=>null,'items'=>null,'is_leader'=>false );
+        $ret = array('success'=>0, 'note'=>null,'items'=>null,'program_role'=>null );
 
         $program = Program::find($id);
 
@@ -450,38 +320,58 @@ class ProgramEditController extends Controller
             $workflow['active']=$program->Workflow->active;
 
             $workflow['workflowArray']=$program->Workflow->Node->map(function($node){
+                $undo_task_count=0;
+                if(sizeof($node->ProgramTeamRoleTask)!=0){
+                    $undo_task_collection=$node->ProgramTeamRoleTask->filter(function ($value) {
+                                return $value->state != '100';
+                            });
+                    $undo_task_count=sizeof($undo_task_collection);
+                }
                 return collect($node->toArray())->only([
                     'id',
                     'plan_day',
                     'actual_day',
                     'array_index',
                     'name',
-                    'type'])->all();
+                    'type'])
+                    ->put('undo_task_count',$undo_task_count)
+                    ->all();
             })->sortBy('array_index');
         }
 
         
-        $isleader=false;
+        
         if(sizeof($program->ProgramTeamRole)==0){
              $programTeamRoles=null;
         }else{
             $programTeamRoles=$program->ProgramTeamRole;
-            foreach($programTeamRoles as $one){
-                if($one->role=='项目组长'&&$one->employee_id==$employee->id) {
-                    $isleader = true;
-                    break;
-                }
-            }
             $programTeamRoles=$programTeamRoles->map(function($programTeamRole){
+                $employee_name=Employee::find($programTeamRole->employee_id)->name;
                 return collect($programTeamRole->toArray())->only([
                     'id',
                     'role',
                     'workload_note',
                     'plan_workload',
                     'actual_workload',
-                    'employee_id'])->put('employee_name',Employee::find($programTeamRole->employee_id)->name)->all();
+                    'employee_id'])->put('employee_name',$employee_name)->all();
             });
         }
+        $programRole=array();
+        if(sizeof($program->ProgramTeamRole)!=0){
+            $programTeamRolesForRoleAdd=$program->ProgramTeamRole;
+            foreach($programTeamRolesForRoleAdd as $one){
+                if($one->employee_id==$employee->id) {
+                    array_push($programRole, $one->role);
+                }
+            }
+        }
+        if($program->FlightModel->Employee->id==$employee->id){
+            array_push($programRole, '型号负责人');
+        }
+        if(sizeof($programRole)==0){
+            array_push($programRole, '只读');
+        }
+
 
 
         
@@ -523,7 +413,7 @@ class ProgramEditController extends Controller
                 'dev_type',
                 'manager_id'])->put('manager_name',$manager_name)->all();
 
-        $ret['is_leader']=$isleader;
+        $ret['program_role']=$programRole;
         $item['programBasic']=$programToArray;
         $item['softwareInfo']=$softwareInfoCol;
         $item['workflow'] =$workflow;

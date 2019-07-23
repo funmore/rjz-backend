@@ -44,13 +44,16 @@ class Employee extends Model
     public function WorkflowNote(){
         return $this->hasMany('App\Models\WorkflowNote');
     }
-    public function ProgramNote(){
-        return $this->hasMany('App\Models\ProgramNote','employee_id','id');
+    public function NodeNote(){
+        return $this->hasMany('App\Models\NodeNote','employee_id','id');
     }
     public function FileProgram(){
         return $this->hasMany('App\Models\FileProgram','employee_id','id');
     }
     public function FileReview(){
         return $this->hasMany('App\Models\FileReview','employee_id','id');
+    }
+    public function NoTestWork(){
+        return $this->hasMany('App\Models\NoTestWork','employee_id','id');
     }
 }

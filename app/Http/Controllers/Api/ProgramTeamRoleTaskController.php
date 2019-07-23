@@ -14,6 +14,7 @@ use App\Models\Token;
 use App\Models\Node;
 use Illuminate\Database\Eloquent\Collection;
 use App\Libraries\PV;
+use App\Models\Employee;
 
 
 
@@ -32,7 +33,7 @@ class ProgramTeamRoleTaskController extends Controller
         $employee =Token::where('token',$token)->first()->Employee;
         $listQuery=$request->all();
 
-        if(filter_var($listQuery['isOne'], FILTER_VALIDATE_BOOLEAN)==true){
+        if(array_key_exists('isOne',$listQuery)&&filter_var($listQuery['isOne'], FILTER_VALIDATE_BOOLEAN)==true){
             $ptr=ProgramTeamRole::find($_REQUEST['id']);
             $ptr_notes=$ptr->ProgramTeamRoleTask;
             if(sizeof($ptr_notes)==0) {
@@ -57,7 +58,36 @@ class ProgramTeamRoleTaskController extends Controller
             $ret['items']=$ptr_notesToArray;
             $ret['total']=sizeof($ptr_notesToArray);
             return json_encode($ret);
-        }else{
+        }else if(array_key_exists('type',$listQuery)&&$listQuery['type']!=''){
+            $node=Node::find($listQuery['node_id']);
+            if($node==null){
+                return json_encode($ret);
+            }
+            $node_tasks=$node->ProgramTeamRoleTask;
+            if(sizeof($node_tasks)==0){
+                return json_encode($ret);
+            }
+            $node_tasksToArray=$node_tasks->map(function($node_task){
+                $employee_name=Employee::find($node_task->ProgramTeamRole->employee_id)->name;
+                return collect($node_task->toArray())->only([
+                    'id',
+                    'task',
+                    'before_node_id',
+                    'due_day',
+                    'overdue_reason',
+                    'state',
+                    'note',
+                    'ratio',
+                    'score',
+                    'created_at',
+                    'updated_at'])
+                    ->put('employee_name',$employee_name)->all();
+            })->sortBy('state')->sortBy('employee_id')->reverse();
+            $ret['items']=$node_tasksToArray;
+            $ret['total']=sizeof($node_tasksToArray);
+            return json_encode($ret);
+
+        }{
             foreach($listQuery['id'] as $id){
                 $ptr=ProgramTeamRole::find($id);
                 $ptr_notes=$ptr->ProgramTeamRoleTask;

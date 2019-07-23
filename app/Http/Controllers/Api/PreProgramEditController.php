@@ -129,7 +129,7 @@ class PreProgramEditController extends Controller
              }
 
 
-             $manager=$program->Model==null?null:Employee::find($program->Model->employee_id);
+             $manager=$program->FightModel==null?null:Employee::find($program->FightModel->employee_id);
 
               
              $program=collect($program->toArray())->only([

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\ProgramTeamRole;
-use App\Models\ProgramNote;
+use App\Models\NodeNote;
 use App\Models\ProgramTeamRoleTask;
 use App\Models\Pvlog;
 use App\Models\Pvstate;
@@ -19,7 +19,7 @@ use App\Models\Employee;
 use App\Libraries\PV;
 
 
-class ProgramNoteController extends Controller
+class NodeNoteController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class ProgramNoteController extends Controller
                 $node=Node::find($_REQUEST['id']);
 
 
-                $p_notes=$node->ProgramNote;
+                $p_notes=$node->NodeNote;
                 if(sizeof($p_notes)==0) {
                     return json_encode($ret);
                 }
@@ -85,12 +85,12 @@ class ProgramNoteController extends Controller
         $postData=$request->all();
 
         $node=Node::find($postData['NodeId']);
-        $p_note = new ProgramNote(array(            'note'      => $postData['note'],
+        $p_note = new NodeNote(array(            'note'      => $postData['note'],
                                                     'state'  => '待解决',
                                                     'employee_id' =>  $employee->id,
                                                     'is_up'   =>'否'
                                             ));
-        $node->ProgramNote()->save($p_note);
+        $node->NodeNote()->save($p_note);
         $p_note=collect($p_note->toArray())->only([
              'id',
              'note',
@@ -156,7 +156,7 @@ class ProgramNoteController extends Controller
 
         $postData=$request->all();
 
-        $p_note=ProgramNote::find($id);
+        $p_note=NodeNote::find($id);
         $p_note->note=$postData['note'];
         $p_note->state=$postData['state'];
         $p_note->is_up=$postData['is_up'];
