@@ -89,46 +89,19 @@ class ProgramEditController extends Controller
                 $programs=$programs->intersect($programsManager);
             }
         }
-
-        if(filter_var($listQuery['isMeCreated'], FILTER_VALIDATE_BOOLEAN)==true){
-            $programsisMeCreated = Program::where('creator_id', $employee->id)->get();
-            if($programs->isEmpty()){
-                $programs=$programs->merge($programsisMeCreated);
-            }else{
-                $programs=$programs->intersect($programsisMeCreated);
+        if(array_key_exists('type',$listQuery)&&$listQuery['type']!=''){
+            if($listQuery['type']=='creator'){
+                $programsisMeCreated = Program::where('creator_id', $employee->id)->get();
+                if($programs->isEmpty()){
+                    $programs=$programs->merge($programsisMeCreated);
+                }else{
+                    $programs=$programs->intersect($programsisMeCreated);
+                }
             }
-        }
 
 
-        if(filter_var($listQuery['isMeMember'], FILTER_VALIDATE_BOOLEAN)==true){
-            $programsisMeMember=Collection::make();
-           $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
-           $noDuplicates = array();
-           foreach ($programTeamRoles as $v) {
-               if (isset($noDuplicates[$v['program_id']])) {
-                   continue;
-               }
-               $noDuplicates[$v['program_id']] = $v;
-           }
-           $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
-
-           if(sizeof($ProgramTeamRoleNoDuplicates)!=0){
-               foreach ($ProgramTeamRoleNoDuplicates as $programTeamRole) {
-                   $programToAdd = Program::find($programTeamRole->program_id);
-                   $programsisMeMember = $programsisMeMember->push($programToAdd);   //push用来添加单个item  merge用来合并两个集合
-               }
-           }
-
-            if($programs->isEmpty()){
-                $programs=$programs->merge($programsisMeMember);
-            }else{
-                $programs=$programs->intersect($programsisMeMember);
-            }
-        }
-
-
-        if(filter_var($listQuery['isMeLeader'], FILTER_VALIDATE_BOOLEAN)==true){
-            $programsisMeMember=Collection::make();
+            if($listQuery['type']=='member'){
+                $programsisMeMember=Collection::make();
             $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
             $noDuplicates = array();
             foreach ($programTeamRoles as $v) {
@@ -141,19 +114,129 @@ class ProgramEditController extends Controller
 
             if(sizeof($ProgramTeamRoleNoDuplicates)!=0){
                 foreach ($ProgramTeamRoleNoDuplicates as $programTeamRole) {
-                    if($programTeamRole->role!='项目组长')
-                        continue;
                     $programToAdd = Program::find($programTeamRole->program_id);
                     $programsisMeMember = $programsisMeMember->push($programToAdd);   //push用来添加单个item  merge用来合并两个集合
                 }
             }
 
-            if($programs->isEmpty()){
-                $programs=$programs->merge($programsisMeMember);
-            }else{
-                $programs=$programs->intersect($programsisMeMember);
+                if($programs->isEmpty()){
+                    $programs=$programs->merge($programsisMeMember);
+                }else{
+                    $programs=$programs->intersect($programsisMeMember);
+                }
+            }
+
+
+            if($listQuery['type']=='leader'){
+                $programsisMeMember=Collection::make();
+                $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
+                $noDuplicates = array();
+                foreach ($programTeamRoles as $v) {
+                    if (isset($noDuplicates[$v['program_id']])) {
+                        continue;
+                    }
+                    $noDuplicates[$v['program_id']] = $v;
+                }
+                $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
+
+                if(sizeof($ProgramTeamRoleNoDuplicates)!=0){
+                    foreach ($ProgramTeamRoleNoDuplicates as $programTeamRole) {
+                        if($programTeamRole->role!='项目组长')
+                            continue;
+                        $programToAdd = Program::find($programTeamRole->program_id);
+                        $programsisMeMember = $programsisMeMember->push($programToAdd);   //push用来添加单个item  merge用来合并两个集合
+                    }
+                }
+
+                if($programs->isEmpty()){
+                    $programs=$programs->merge($programsisMeMember);
+                }else{
+                    $programs=$programs->intersect($programsisMeMember);
+                }
+            }
+            if($listQuery['type']=='supervisor'){
+                $programsisMeMember=Collection::make();
+                $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
+                $noDuplicates = array();
+                foreach ($programTeamRoles as $v) {
+                    if (isset($noDuplicates[$v['program_id']])) {
+                        continue;
+                    }
+                    $noDuplicates[$v['program_id']] = $v;
+                }
+                $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
+
+                if(sizeof($ProgramTeamRoleNoDuplicates)!=0){
+                    foreach ($ProgramTeamRoleNoDuplicates as $programTeamRole) {
+                        if($programTeamRole->role!='监督员')
+                            continue;
+                        $programToAdd = Program::find($programTeamRole->program_id);
+                        $programsisMeMember = $programsisMeMember->push($programToAdd);   //push用来添加单个item  merge用来合并两个集合
+                    }
+                }
+
+                if($programs->isEmpty()){
+                    $programs=$programs->merge($programsisMeMember);
+                }else{
+                    $programs=$programs->intersect($programsisMeMember);
+                }
+            }
+            if($listQuery['type']=='qa'){
+                $programsisMeMember=Collection::make();
+                $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
+                $noDuplicates = array();
+                foreach ($programTeamRoles as $v) {
+                    if (isset($noDuplicates[$v['program_id']])) {
+                        continue;
+                    }
+                    $noDuplicates[$v['program_id']] = $v;
+                }
+                $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
+
+                if(sizeof($ProgramTeamRoleNoDuplicates)!=0){
+                    foreach ($ProgramTeamRoleNoDuplicates as $programTeamRole) {
+                        if($programTeamRole->role!='质量保证员')
+                            continue;
+                        $programToAdd = Program::find($programTeamRole->program_id);
+                        $programsisMeMember = $programsisMeMember->push($programToAdd);   //push用来添加单个item  merge用来合并两个集合
+                    }
+                }
+
+                if($programs->isEmpty()){
+                    $programs=$programs->merge($programsisMeMember);
+                }else{
+                    $programs=$programs->intersect($programsisMeMember);
+                }
+            }
+            if($listQuery['type']=='cm'){
+                $programsisMeMember=Collection::make();
+                $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
+                $noDuplicates = array();
+                foreach ($programTeamRoles as $v) {
+                    if (isset($noDuplicates[$v['program_id']])) {
+                        continue;
+                    }
+                    $noDuplicates[$v['program_id']] = $v;
+                }
+                $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
+
+                if(sizeof($ProgramTeamRoleNoDuplicates)!=0){
+                    foreach ($ProgramTeamRoleNoDuplicates as $programTeamRole) {
+                        if($programTeamRole->role!='配置管理员')
+                            continue;
+                        $programToAdd = Program::find($programTeamRole->program_id);
+                        $programsisMeMember = $programsisMeMember->push($programToAdd);   //push用来添加单个item  merge用来合并两个集合
+                    }
+                }
+
+                if($programs->isEmpty()){
+                    $programs=$programs->merge($programsisMeMember);
+                }else{
+                    $programs=$programs->intersect($programsisMeMember);
+                }
             }
         }
+        
 
 
         //将programs按照创建时间的降序排列
@@ -234,7 +317,297 @@ class ProgramEditController extends Controller
         $ret['total']=sizeof($programsToArray);
         return json_encode($ret);
     }
+/**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
 
+    public function custom(Request $request)
+    {
+        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null );
+        $listQuery=$request->all();
+        $token = $request->header('AdminToken');
+        $employee =Token::where('token',$token)->first()->Employee;
+
+        $programs=Collection::make();
+
+
+        if(array_key_exists('title',$listQuery)&&$listQuery['title']!=''){
+            if(strpos($listQuery['title'], '*') !== false) {
+                $programsTitle = Program::where('name', 'LIKE', str_replace('*', '%', $listQuery['title']))->get();
+            }else{
+                $programsTitle = Program::where('name', 'LIKE', '%'.$listQuery['title'].'%')->get();
+            }
+            if($programs->isEmpty()){
+                $programs=$programs->merge($programsTitle);
+            }else{
+                $programs=$programs->intersect($programsTitle);
+            }
+        }
+        if(array_key_exists('model_id',$listQuery)&&$listQuery['model_id']!=''){
+            $programsModel = Program::where('model_id', $listQuery['model_id'])->get();
+            if($programs->isEmpty()){
+                $programs=$programs->merge($programsModel);
+            }else{
+                $programs=$programs->intersect($programsModel);
+            }
+        }
+
+        if(array_key_exists('classification',$listQuery)&&$listQuery['classification']!=''){
+            $programsClassification = Program::where('classification', $listQuery['classification'])->get();
+            if($programs->isEmpty()){
+                $programs=$programs->merge($programsClassification);
+            }else{
+                $programs=$programs->intersect($programsClassification);
+            }
+        }
+
+        if(array_key_exists('program_type',$listQuery)&&$listQuery['program_type']!=''){
+            $programsProgramType = Program::where('program_type', $listQuery['program_type'])->get();
+            if($programs->isEmpty()){
+                $programs=$programs->merge($programsProgramType);
+            }else{
+                $programs=$programs->intersect($programsProgramType);
+            }
+        }
+
+        if(array_key_exists('manager',$listQuery)&&$listQuery['manager']!=''){
+            $programsManager = Program::where('manager_id', (int)$listQuery['manager'])->get();
+            if($programs->isEmpty()){
+                $programs=$programs->merge($programsManager);
+            }else{
+                $programs=$programs->intersect($programsManager);
+            }
+        }
+        if(array_key_exists('type',$listQuery)&&$listQuery['type']!=''){
+            if($listQuery['type']=='creator'){
+                $programsisMeCreated = Program::where('creator_id', $employee->id)->get();
+                if($programs->isEmpty()){
+                    $programs=$programs->merge($programsisMeCreated);
+                }else{
+                    $programs=$programs->intersect($programsisMeCreated);
+                }
+            }
+
+
+            if($listQuery['type']=='member'){
+                $programsisMeMember=Collection::make();
+            $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
+            $noDuplicates = array();
+            foreach ($programTeamRoles as $v) {
+                if (isset($noDuplicates[$v['program_id']])) {
+                    continue;
+                }
+                $noDuplicates[$v['program_id']] = $v;
+            }
+            $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
+
+            if(sizeof($ProgramTeamRoleNoDuplicates)!=0){
+                foreach ($ProgramTeamRoleNoDuplicates as $programTeamRole) {
+                    $programToAdd = Program::find($programTeamRole->program_id);
+                    $programsisMeMember = $programsisMeMember->push($programToAdd);   //push用来添加单个item  merge用来合并两个集合
+                }
+            }
+
+                if($programs->isEmpty()){
+                    $programs=$programs->merge($programsisMeMember);
+                }else{
+                    $programs=$programs->intersect($programsisMeMember);
+                }
+            }
+
+
+            if($listQuery['type']=='leader'){
+                $programsisMeMember=Collection::make();
+                $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
+                $noDuplicates = array();
+                foreach ($programTeamRoles as $v) {
+                    if (isset($noDuplicates[$v['program_id']])) {
+                        continue;
+                    }
+                    $noDuplicates[$v['program_id']] = $v;
+                }
+                $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
+
+                if(sizeof($ProgramTeamRoleNoDuplicates)!=0){
+                    foreach ($ProgramTeamRoleNoDuplicates as $programTeamRole) {
+                        if($programTeamRole->role!='项目组长')
+                            continue;
+                        $programToAdd = Program::find($programTeamRole->program_id);
+                        $programsisMeMember = $programsisMeMember->push($programToAdd);   //push用来添加单个item  merge用来合并两个集合
+                    }
+                }
+
+                if($programs->isEmpty()){
+                    $programs=$programs->merge($programsisMeMember);
+                }else{
+                    $programs=$programs->intersect($programsisMeMember);
+                }
+            }
+            if($listQuery['type']=='supervisor'){
+                $programsisMeMember=Collection::make();
+                $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
+                $noDuplicates = array();
+                foreach ($programTeamRoles as $v) {
+                    if (isset($noDuplicates[$v['program_id']])) {
+                        continue;
+                    }
+                    $noDuplicates[$v['program_id']] = $v;
+                }
+                $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
+
+                if(sizeof($ProgramTeamRoleNoDuplicates)!=0){
+                    foreach ($ProgramTeamRoleNoDuplicates as $programTeamRole) {
+                        if($programTeamRole->role!='监督员')
+                            continue;
+                        $programToAdd = Program::find($programTeamRole->program_id);
+                        $programsisMeMember = $programsisMeMember->push($programToAdd);   //push用来添加单个item  merge用来合并两个集合
+                    }
+                }
+
+                if($programs->isEmpty()){
+                    $programs=$programs->merge($programsisMeMember);
+                }else{
+                    $programs=$programs->intersect($programsisMeMember);
+                }
+            }
+            if($listQuery['type']=='qa'){
+                $programsisMeMember=Collection::make();
+                $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
+                $noDuplicates = array();
+                foreach ($programTeamRoles as $v) {
+                    if (isset($noDuplicates[$v['program_id']])) {
+                        continue;
+                    }
+                    $noDuplicates[$v['program_id']] = $v;
+                }
+                $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
+
+                if(sizeof($ProgramTeamRoleNoDuplicates)!=0){
+                    foreach ($ProgramTeamRoleNoDuplicates as $programTeamRole) {
+                        if($programTeamRole->role!='质量保证员')
+                            continue;
+                        $programToAdd = Program::find($programTeamRole->program_id);
+                        $programsisMeMember = $programsisMeMember->push($programToAdd);   //push用来添加单个item  merge用来合并两个集合
+                    }
+                }
+
+                if($programs->isEmpty()){
+                    $programs=$programs->merge($programsisMeMember);
+                }else{
+                    $programs=$programs->intersect($programsisMeMember);
+                }
+            }
+            if($listQuery['type']=='cm'){
+                $programsisMeMember=Collection::make();
+                $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
+                $noDuplicates = array();
+                foreach ($programTeamRoles as $v) {
+                    if (isset($noDuplicates[$v['program_id']])) {
+                        continue;
+                    }
+                    $noDuplicates[$v['program_id']] = $v;
+                }
+                $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
+
+                if(sizeof($ProgramTeamRoleNoDuplicates)!=0){
+                    foreach ($ProgramTeamRoleNoDuplicates as $programTeamRole) {
+                        if($programTeamRole->role!='配置管理员')
+                            continue;
+                        $programToAdd = Program::find($programTeamRole->program_id);
+                        $programsisMeMember = $programsisMeMember->push($programToAdd);   //push用来添加单个item  merge用来合并两个集合
+                    }
+                }
+
+                if($programs->isEmpty()){
+                    $programs=$programs->merge($programsisMeMember);
+                }else{
+                    $programs=$programs->intersect($programsisMeMember);
+                }
+            }
+        }
+        
+
+
+        //将programs按照创建时间的降序排列
+        $programs=$programs->filter(function($program){
+          return $program->state=='首轮测试执行中'
+               ||$program->state=='首轮测试结束'
+               ||$program->state=='完成最终报告待评审'
+               ||$program->state=='通过评审未归档'
+               ||$program->state=='已归档';
+        })->sortBy(function($program)
+        {
+            return $program->created_at;
+        })->reverse();
+
+         $programsToArray=$programs->map(function($program){
+             $manager=$program->FlightModel==null?'':Employee::find($program->FlightModel->employee_id);
+             $program_leader=null;
+             $program_team_strict=null;
+             $workflow_state=null;
+             $issue=null;
+             if(sizeof($program->Workflow)!=0) {
+                 $node = $program->Workflow->Node->first(function ($key, $value) {
+                     return $value->array_index == $value->Workflow->active;
+                 });
+                 $programIssue =$node->NodeNote->filter(function($value){
+                     return   $value->is_up=='是';
+                 })->map(function($item,$key){
+                     return $item->note;
+                 })->all();
+                 $programIssue=implode('/',$programIssue);
+
+                 $workflow_state=$node->name;
+                 $issue=$programIssue;
+             }
+             if(sizeof($program->ProgramTeamRole)!=0) {
+                 $programTeamLeader = $program->ProgramTeamRole->first(function ($key, $value) {
+                     return $value->role == '项目组长';
+                 });
+                 $programTeamStrict = $program->ProgramTeamRole->filter(function ($value) {
+                     return $value->role == '项目组长' || $value->role == '项目组员';
+                 })->map(function ($item) {
+                     return Employee::find($item->employee_id)->name;
+                 })->all();
+                 $programTeamStrictName = implode('/', $programTeamStrict);
+
+                 $program_leader=Employee::find($programTeamLeader->employee_id)==null?null:Employee::find($programTeamLeader->employee_id)->name;
+                 $program_team_strict=$programTeamStrictName;
+             }
+             $program=collect($program->toArray())->only([
+                 'id',
+                 'overdue_reason',
+                 'plan_start_time',
+                 'plan_end_time',
+                 'actual_start_time',
+                 'actual_end_time',
+                 'contract_id',
+                 'workflow_id',
+                 'name',
+                 'program_identity',
+                 'model_id',
+                 'program_type',
+                 'classification',
+                 'program_stage',
+                 'dev_type',
+                 'state',
+                 'creator_id',
+                 'manager_id'])
+                 ->put('manager',$manager)
+                 ->put('program_leader',$program_leader)
+                 ->put('program_team_strict',$program_team_strict)
+                 ->put('workflow_state',$workflow_state)
+                 ->put('issue',$issue)
+                 ->all();
+             return $program;
+         });
+
+        $ret['items']=$programsToArray->toArray();
+        $ret['total']=sizeof($programsToArray);
+        return json_encode($ret);
+    }
     /**
      * Show the form for creating a new resource.
      *

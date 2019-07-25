@@ -91,14 +91,6 @@ class PreProgramEditController extends Controller
             }
         }
 
-        if(filter_var($listQuery['isMeCreated'], FILTER_VALIDATE_BOOLEAN)==true){
-            $programsisMeCreated = Program::where('creator_id', $employee->id)->get();
-            if($programs->isEmpty()){
-                $programs=$programs->merge($programsisMeCreated);
-            }else{
-                $programs=$programs->intersect($programsisMeCreated);
-            }
-        }
 
 
  

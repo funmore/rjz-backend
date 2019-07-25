@@ -22,6 +22,7 @@ Route::group(['middleware' => ['weixin']], function () {
 
 
     Route::resource('/management/program', 'Api\ProgramEditController');
+    Route::resource('/management/customprogram', 'Api\ProgramEditController@custom');
     Route::resource('/pre/program', 'Api\PreProgramEditController');
     Route::get('/pre/program/preshow', 'Api\PreProgramEditController@preshow');
     
