@@ -554,72 +554,99 @@ class ProgramEditController extends Controller
             return $program->created_at;
         })->reverse();
 
+
+
+
+
+
+
          $programsToArray=$programs->map(function($program){
+
+            $manager=$program->FlightModel==null?'':Employee::find($program->FlightModel->employee_id);
+            $manager_name=$manager->name;
+            $model_name=$program->FlightModel==null?'':$program->FlightModel->model_name;
+            $programBasic=collect($program->toArray())->only([
+                'id',
+                'overdue_reason',
+                'plan_start_time',
+                'plan_end_time',
+                'actual_start_time',
+                'actual_end_time',
+                'contract_id',
+                'workflow_id',
+                'name',
+                'program_identity',
+                'model_id',
+                'program_type',
+                'classification',
+                'program_stage',
+                'dev_type',
+                'state',
+                'creator_id',
+                'manager_id'])
+                ->put('model_name',$model_name)
+                ->put('manager_name',$manager_name)
+                ->put('manager',$manager)
+                ->all();
 
             $contact=array('plan'=>null,'quality'=>null,'code'=>null);
             if(sizeof($program->Contact)==0){
-           }else{
-               $contacts=$program->Contact;
+                }else{
+                    $contacts=$program->Contact;
 
-               $contacts=$contacts->map(function($member){
-                   return collect($member->toArray())->only([
-                       'id',
-                       'is_12s',
-                       'type',
-                       'organ',
-                       'name',
-                       'tele'])->all();
-               });
-               $contact['plan']=Contact::where('program_id', $program->id)->where('type','计划')->first()->name;
-               $contact['quality']=Contact::where('program_id', $program->id)->where('type','质量')->first()->name;
-               $contact['code']=Contact::where('program_id', $program->id)->where('type','设计')->first()->name;
-           }
-   
-           if(sizeof($program->SoftwareInfo)==0){
-               $softwareInfoCol=null;
-           }else{
-               $softwareInfoCol=$program->SoftwareInfo;
-               $softwareInfoCol=$softwareInfoCol->map(function($softwareInfo){
-               return collect($softwareInfo->toArray())->only([
-                   'id',
-                   'name',
-                   'version_id',
-                   'complier',
-                   'runtime',
-                   'size',
-                   'reduced_code_size',
-                   'reduced_reason',
-                   'software_cate',
-                   'software_sub_cate',
-                   'cpu_type',
-                   'code_langu',
-                   'software_usage',
-                   'software_type'])->all();
-               });
-           }
-   
-           
-        
+                    $contacts=$contacts->map(function($member){
+                        return collect($member->toArray())->only([
+                            'id',
+                            'is_12s',
+                            'type',
+                            'organ',
+                            'name',
+                            'tele'])->all();
+                    });
+                    $contact['plan']=Contact::where('program_id', $program->id)->where('type','计划')->first()->name;
+                    $contact['quality']=Contact::where('program_id', $program->id)->where('type','质量')->first()->name;
+                    $contact['code']=Contact::where('program_id', $program->id)->where('type','设计')->first()->name;
+                }
+                $softwareInfoCol=null;
+                if(sizeof($program->SoftwareInfo)==0){
 
-             $manager=$program->FlightModel==null?'':Employee::find($program->FlightModel->employee_id);
-             $program_leader=null;
-             $program_team_strict=null;
-             $workflow_state=null;
-             $issue=null;
+                }else{
+                    $softwareInfoCol=$program->SoftwareInfo;
+                    $softwareInfoCol=$softwareInfoCol->map(function($softwareInfo){
+                    return collect($softwareInfo->toArray())->only([
+                        'id',
+                        'name',
+                        'version_id',
+                        'complier',
+                        'runtime',
+                        'size',
+                        'reduced_code_size',
+                        'reduced_reason',
+                        'software_cate',
+                        'software_sub_cate',
+                        'cpu_type',
+                        'code_langu',
+                        'software_usage',
+                        'software_type'])->all();
+                    });
+                }
+
+             $workflow=null;
              if(sizeof($program->Workflow)!=0) {
                  $node = $program->Workflow->Node->first(function ($key, $value) {
                      return $value->array_index == $value->Workflow->active;
                  });
-                 $programIssue =$node->NodeNote->filter(function($value){
+                 $workflow_issue =$node->NodeNote->filter(function($value){
                      return   $value->is_up=='是';
                  })->map(function($item,$key){
                      return $item->note;
                  })->all();
-                 $programIssue=implode('/',$programIssue);
+                 $workflow_issue=implode('/',$workflow_issue);
 
                  $workflow_state=$node->name;
-                 $issue=$programIssue;
+                 $workflow=array('workflow_state'=>$workflow_state,'workflow_issue'=>$workflow_issue);
              }
+             $programTeamRole=null;
              if(sizeof($program->ProgramTeamRole)!=0) {
                  $programTeamLeader = $program->ProgramTeamRole->first(function ($key, $value) {
                      return $value->role == '项目组长';
@@ -633,35 +660,15 @@ class ProgramEditController extends Controller
 
                  $program_leader=Employee::find($programTeamLeader->employee_id)==null?null:Employee::find($programTeamLeader->employee_id)->name;
                  $program_team_strict=$programTeamStrictName;
+                 $programTeamRole=array('program_leader'=>$program_leader,'program_team_strict'=>$program_team_strict);
              }
-             $program=collect($program->toArray())->only([
-                 'id',
-                 'overdue_reason',
-                 'plan_start_time',
-                 'plan_end_time',
-                 'actual_start_time',
-                 'actual_end_time',
-                 'contract_id',
-                 'workflow_id',
-                 'name',
-                 'program_identity',
-                 'model_id',
-                 'program_type',
-                 'classification',
-                 'program_stage',
-                 'dev_type',
-                 'state',
-                 'creator_id',
-                 'manager_id'])
-                 ->put('manager',$manager)
-                 ->put('program_leader',$program_leader)
-                 ->put('program_team_strict',$program_team_strict)
-                 ->put('workflow_state',$workflow_state)
-                 ->put('issue',$issue)
-                 ->put('contact',$contact)
-                 ->put('softwareInfoCol',$softwareInfoCol)
-                 ->all();
-             return $program;
+        
+            $item=array('programBasic'=>$programBasic,
+                        'contact'=>$contact,
+                        'softwareInfoCol'=>$softwareInfoCol,
+                        'workflow'=>$workflow,
+                        'programTeamRole'=>$programTeamRole);
+             return $item;
          });
 
         $ret['items']=$programsToArray->toArray();
