@@ -257,7 +257,7 @@ class ProgramEditController extends Controller
              $program_team_strict=null;
              $workflow_state=null;
              $issue=null;
-             if(sizeof($program->Workflow)!=0) {
+             if($program->Workflow!=null) {
                  $node = $program->Workflow->Node->first(function ($key, $value) {
                      return $value->array_index == $value->Workflow->active;
                  });
@@ -632,7 +632,7 @@ class ProgramEditController extends Controller
                 }
 
              $workflow=null;
-             if(sizeof($program->Workflow)!=0) {
+             if($program->Workflow!=null) {
                  $node = $program->Workflow->Node->first(function ($key, $value) {
                      return $value->array_index == $value->Workflow->active;
                  });
@@ -751,7 +751,7 @@ class ProgramEditController extends Controller
         }
         
 
-        if(sizeof($program->Workflow)==0){
+        if($program->Workflow==null){
              $workflow=null;
         }else{
             $workflow = array('id'=>null,'workflow_name'=>null, 'active'=>null,'workflowArray'=>null );
