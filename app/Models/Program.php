@@ -29,7 +29,8 @@ class Program extends Model
                                 'program_stage',
                                 'dev_type',
                                 'creator_id',
-                                'manager_id'];
+                                'manager_id',
+                                'note'];
 
     public function SoftwareInfo(){
     	return $this->hasMany('App\Models\SoftwareInfo');
@@ -66,6 +67,21 @@ class Program extends Model
     public function FileProgram()
     {
         return $this->hasMany('App\Models\FileProgram','program_id','id');
+    }
+    public static function boot() {
+        parent::boot();
+
+        static::deleting(function($item) { // before delete() method call this
+             $item->Contact()->delete();
+             $item->SoftwareInfo()->delete();
+             $item->Workflow()->delete();
+             $item->ProgramTeamRole()->delete();
+
+             $item->Pvstate()->delete();
+             $item->Pvlog()->delete();
+
+             $item->PostProgram()->delete();
+        });
     }
 
 }

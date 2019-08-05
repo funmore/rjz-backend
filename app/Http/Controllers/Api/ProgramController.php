@@ -123,6 +123,9 @@ class ProgramController extends Controller
         if(array_key_exists('overdue_reason',$postData)&&$postData['overdue_reason']!=''){
                 $program['overdue_reason'] = $postData['overdue_reason'];
         }
+        if(array_key_exists('note',$postData)&&$postData['note']!=''){
+                $program['note'] = $postData['note'];
+        }
         if(array_key_exists('state',$postData)&&$postData['state']!=''){
                 if($program['state']!="首轮测试执行中"&&$postData['state']=="首轮测试执行中"){
                     $ret['noticeArray']=$pv->storePvState($program,$employee);

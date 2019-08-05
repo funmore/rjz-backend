@@ -25,5 +25,12 @@ class ProgramTeamRole extends Model
     public function ProgramTeamRoleTask(){
         return $this->hasMany('App\Models\ProgramTeamRoleTask','programteamrole_id','id');
     }
+    public static function boot() {
+        parent::boot();
+
+        static::deleting(function($item) { // before delete() method call this
+             $item->ProgramTeamRoleTask()->delete();
+        });
+    }
 
 }

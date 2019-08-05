@@ -235,6 +235,11 @@ class ProgramEditController extends Controller
                     $programs=$programs->intersect($programsisMeMember);
                 }
             }
+        }else{
+            if(array_key_exists('first',$listQuery)&&$listQuery['first']=='true'){
+                $programs=null;
+                $programs=Program::All();
+            }
         }
         
 
@@ -250,7 +255,8 @@ class ProgramEditController extends Controller
         {
             return $program->created_at;
         })->reverse();
-
+        $ret['total']=sizeof($programs);
+        $programs=$programs->forPage($listQuery['page'], $listQuery['limit']);
          $programsToArray=$programs->map(function($program){
              $manager=$program->FlightModel==null?'':Employee::find($program->FlightModel->employee_id);
              $program_leader=null;
@@ -303,7 +309,8 @@ class ProgramEditController extends Controller
                  'dev_type',
                  'state',
                  'creator_id',
-                 'manager_id'])
+                 'manager_id',
+                 'note'])
                  ->put('manager',$manager)
                  ->put('program_leader',$program_leader)
                  ->put('program_team_strict',$program_team_strict)
@@ -314,7 +321,7 @@ class ProgramEditController extends Controller
          });
 
         $ret['items']=$programsToArray->toArray();
-        $ret['total']=sizeof($programsToArray);
+
         return json_encode($ret);
     }
 
@@ -553,6 +560,8 @@ class ProgramEditController extends Controller
         {
             return $program->created_at;
         })->reverse();
+        $ret['total']=sizeof($programs);
+        $programs=$programs->forPage($listQuery['page'], $listQuery['limit']);
 
 
 
@@ -672,7 +681,6 @@ class ProgramEditController extends Controller
          });
 
         $ret['items']=$programsToArray->toArray();
-        $ret['total']=sizeof($programsToArray);
         return json_encode($ret);
     }
     /**
@@ -895,8 +903,33 @@ class ProgramEditController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
-        return json_encode($id);
+        $ret = array('success'=>0, 'note'=>null,'total'=>0,'is_okay'=>true );
+        $token = $request->header('AdminToken');
+        $employee =Token::where('token',$token)->first()->Employee;
+
+        $program=Program::find($id);
+        if($program==null){
+            $ret['is_okay']=false;
+            $ret['note']='该项目不存在';
+            return json_encode($ret);
+        }
+
+        //项目创建人 型号负责人  管理员可以删除
+        $deletePermission= $program->creator_id==$employee->id||$program->manager_id==$employee->id||$employee->is_admin==true;
+        if(!$deletePermission){
+            $ret['is_okay']=false;
+            $ret['note']='您无权限删除此项目';
+            return json_encode($ret);
+        }
+
+        $program->delete();
+
+
+        
+        
+
+        return json_encode($ret);
     }
 }
