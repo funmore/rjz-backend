@@ -255,8 +255,9 @@ class ProgramEditController extends Controller
         {
             return $program->created_at;
         })->reverse();
+
         $ret['total']=sizeof($programs);
-        $programs=$programs->forPage($listQuery['page'], $listQuery['limit']);
+            $programs=$programs->forPage($listQuery['page'], $listQuery['limit']);
          $programsToArray=$programs->map(function($program){
              $manager=$program->FlightModel==null?'':Employee::find($program->FlightModel->employee_id);
              $program_leader=null;
@@ -781,10 +782,11 @@ class ProgramEditController extends Controller
                     'actual_day',
                     'array_index',
                     'name',
-                    'type'])
+                    'type',
+                    'created_at'])
                     ->put('undo_task_count',$undo_task_count)
                     ->all();
-            })->sortBy('array_index');
+            })->sortBy('array_index')->values()->toArray();
         }
 
         
