@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use App\Libraries\PERMISSION;
 
 
 use App\Models\UserInfo;
@@ -242,7 +243,13 @@ class ProgramEditController extends Controller
             }
         }
         
-
+        if($employee->is_director!=true&&$employee->is_v_director!=true&&$employee->is_admin!=true){
+            $permission = new PERMISSION();
+            $programs=$programs->filter(function($program)use($employee,$permission){
+                $ret=$permission->checkPermission($program,$employee);
+                return $ret;
+            });
+        }
 
         //将programs按照创建时间的降序排列
         $programs=$programs->filter(function($program){

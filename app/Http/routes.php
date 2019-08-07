@@ -47,6 +47,7 @@ Route::group(['middleware' => ['weixin']], function () {
     Route::resource('/BatchImport', 'Api\BatchImportController');
     Route::resource('/notestwork', 'Api\NoTestWorkController');
     Route::resource('/notestworklogmonth', 'Api\NoTestWorkController@month');
+    Route::resource('/favor', 'Api\FavorController');
 
 
     //workfow end
