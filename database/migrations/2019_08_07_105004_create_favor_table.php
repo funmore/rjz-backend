@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatedelayApp extends Migration
+class CreateFavorTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,11 +12,12 @@ class CreatedelayApp extends Migration
      */
     public function up()
     {
-        Schema::create('delay_apply', function (Blueprint $table) {
+        Schema::create('favor', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ptr_note_id');   //所属的ptr_note
-            $table->string('delay_reason');     
-            $table->string('delay_day');
+            $table->integer('employee_id');
+            $table->string('type');
+            $table->string('value');
+            $table->string('default');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ class CreatedelayApp extends Migration
      */
     public function down()
     {
-        Schema::drop('delay_apply');
+        Schema::drop('favor');
     }
 }

@@ -145,7 +145,6 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\ResponseMacroServiceProvider::class,
-		Encore\Admin\Providers\AdminServiceProvider::class,
 
     ],
 

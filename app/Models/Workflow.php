@@ -36,4 +36,12 @@ class Workflow extends Model
      public function WorkflowTemplate(){
     	return $this->belongsTo('App\Models\WorkflowTemplate','workflow_template_id','id');
     }
+    public static function boot() {
+        parent::boot();
+
+        static::deleting(function($item) { // before delete() method call this
+            $item->Node()->delete();
+            $item->WorkflowNote()->delete();
+        });
+    }
 }

@@ -86,9 +86,9 @@ class NodeNoteController extends Controller
 
         $node=Node::find($postData['NodeId']);
         $p_note = new NodeNote(array(            'note'      => $postData['note'],
-                                                    'state'  => '待解决',
+                                                    'state'  => $postData['state'],
                                                     'employee_id' =>  $employee->id,
-                                                    'is_up'   =>'否'
+                                                    'is_up'   =>$postData['is_up']
                                             ));
         $node->NodeNote()->save($p_note);
         $p_note=collect($p_note->toArray())->only([

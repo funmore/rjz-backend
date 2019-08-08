@@ -31,4 +31,12 @@ class ProgramTeamRoleTask extends Model
     public function DelayApply(){
         return $this->hasMany('App\Models\DelayApply','ptr_note_id','id');
     }
+    public static function boot() {
+        parent::boot();
+
+        static::deleting(function($item) { // before delete() method call this
+             $item->DailyNote()->delete();
+             $item->DelayApply()->delete();
+        });
+    }
 }

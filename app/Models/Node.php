@@ -30,4 +30,11 @@ class Node extends Model
     public function ProgramTeamRoleTask(){
         return $this->hasMany('App\Models\ProgramTeamRoleTask','before_node_id','id');
     }
+    public static function boot() {
+        parent::boot();
+
+        static::deleting(function($item) { // before delete() method call this
+            $item->NodeNote()->delete();
+        });
+    }
 }

@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use App\Libraries\PV;
+use App\Libraries\PERMISSION;
 
 
 use App\Models\UserInfo;
@@ -90,10 +91,20 @@ class PreProgramEditController extends Controller
                 $programs=$programs->intersect($programsManager);
             }
         }
+        if(array_key_exists('first',$listQuery)&&$listQuery['first']=='true'){
+            $programs=null;
+            $programs=Program::All();
+        }
 
 
 
- 
+        if($employee->is_director!=true&&$employee->is_v_director!=true&&$employee->is_admin!=true){
+            $permission = new PERMISSION();
+            $programs=$programs->filter(function($program)use($employee,$permission){
+                $ret=$permission->checkPermission($program,$employee);
+                return $ret;
+            });
+        }
 
 
         //将programs按照创建时间的降序排列
@@ -104,6 +115,8 @@ class PreProgramEditController extends Controller
         {
             return $program->created_at;
         })->reverse();
+        $ret['total']=sizeof($programs);
+        $programs=$programs->forPage($listQuery['page'], $listQuery['limit']);
 
          $programsToArray=$programs->map(function($program){
              $create_step=['项目的信息','联系人配置'];
@@ -121,7 +134,7 @@ class PreProgramEditController extends Controller
              }
 
 
-             $manager=$program->FightModel==null?null:Employee::find($program->FightModel->employee_id);
+             $manager=$program->FlightModel==null?null:Employee::find($program->FlightModel->employee_id);
 
               
              $program=collect($program->toArray())->only([
@@ -141,7 +154,8 @@ class PreProgramEditController extends Controller
                  'program_stage',
                  'dev_type',
                  'state',
-                 'creator_id'])
+                 'creator_id',
+                 'note'])
                  ->put('manager',$manager)
                  ->put('create_step',$create_step)
                  ->all();
@@ -149,7 +163,6 @@ class PreProgramEditController extends Controller
          });
 
         $ret['items']=$programsToArray->toArray();
-        $ret['total']=sizeof($programsToArray);
         return json_encode($ret);
     }
 
@@ -594,30 +607,6 @@ class PreProgramEditController extends Controller
 
             $pv = new PV();
             $ret['noticeArray']=$pv->storePvState($program,$employee);
-            // $noDuplicates = array();
-            // foreach ($programTeamRoles as $v) {
-            //     if (isset($noDuplicates[$v['employee_id']])) {
-            //         continue;
-            //     }
-            //     $noDuplicates[$v['employee_id']] = $v;
-            // }
-            // $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
-            // foreach ($ProgramTeamRoleNoDuplicates as $member) {
-            //     $pvstate = new Pvstate(array(
-            //         'employee_id' => $member['employee_id'],
-            //         'is_read' => '0'
-            //     ));
-            //     if ($member['employee_id'] == $employee->id) {
-            //         $pvstate->is_read = '1';
-            //     }
-            //     $program->Pvstate()->save($pvstate);
-            // }
-
-
-            // $pvlog = new Pvlog(array('changer_id' => $employee->id,
-            //     'change_note' => '创建了新项目',
-            // ));
-            // $program->Pvlog()->save($pvlog);
         }
 
         $ret['id']=$program->id;

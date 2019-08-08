@@ -19,4 +19,5 @@ class Contact extends Model
     {
         return $this->belongs('App\Models\Program','program_id','id');
     }
+    
 }
