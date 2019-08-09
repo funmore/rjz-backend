@@ -23,7 +23,7 @@ class PERMISSION {
         $ret=$program->ProgramTeamRole->search(function ($item)use($e_id) {
             return $item->employee_id==$e_id;
         });
-        if($ret!=false){
+        if(is_numeric($ret)==true){
             return true;
         }
       }

@@ -202,7 +202,7 @@ class PreProgramEditController extends Controller
         $program['type']            = $programBasic['type'];
         $program['ref']             = $programBasic['ref'];
         $program['program_source']  = $programBasic['program_source'];
-        $program['state']           = '首轮测试执行中';
+        $program['state']           = '正式项目';
         $program['program_identity']= $programBasic['program_identity'];
         $program['model_id']        = $programBasic['model_id'];
         $program['program_type']    = $programBasic['program_type'];
@@ -600,7 +600,7 @@ class PreProgramEditController extends Controller
 
                 }
             }
-            $program->state='首轮测试执行中';
+            $program->state='正式项目';
             $program->save();
 
 

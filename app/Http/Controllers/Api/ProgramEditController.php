@@ -253,11 +253,7 @@ class ProgramEditController extends Controller
 
         //将programs按照创建时间的降序排列
         $programs=$programs->filter(function($program){
-          return $program->state=='首轮测试执行中'
-               ||$program->state=='首轮测试结束'
-               ||$program->state=='完成最终报告待评审'
-               ||$program->state=='通过评审未归档'
-               ||$program->state=='已归档';
+          return $program->state=='正式项目';
         })->sortBy(function($program)
         {
             return $program->created_at;
@@ -559,11 +555,7 @@ class ProgramEditController extends Controller
 
         //将programs按照创建时间的降序排列
         $programs=$programs->filter(function($program){
-          return $program->state=='首轮测试执行中'
-               ||$program->state=='首轮测试结束'
-               ||$program->state=='完成最终报告待评审'
-               ||$program->state=='通过评审未归档'
-               ||$program->state=='已归档';
+          return $program->state=='正式项目';
         })->sortBy(function($program)
         {
             return $program->created_at;

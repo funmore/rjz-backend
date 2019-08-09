@@ -127,7 +127,7 @@ class ProgramController extends Controller
                 $program['note'] = $postData['note'];
         }
         if(array_key_exists('state',$postData)&&$postData['state']!=''){
-                if($program['state']!="首轮测试执行中"&&$postData['state']=="首轮测试执行中"){
+                if($program['state']!="正式项目"&&$postData['state']=="正式项目"){
                     $ret['noticeArray']=$pv->storePvState($program,$employee);
                 }else{
                     $pv->storePvlog($program,$employee,'项目信息变更');
