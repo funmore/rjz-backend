@@ -50,7 +50,7 @@ class SoftwareInfoController extends Controller
     {
         $token = $request->header('AdminToken');
         $employee =Token::where('token',$token)->first()->Employee;
-        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null);
+        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null,'isOkay'=>true);
 
         $postData=$request->all();
 
@@ -73,22 +73,10 @@ class SoftwareInfoController extends Controller
                                                 ));
         $program->SoftwareInfo()->save($softwareInfo);
 
-
         $pv = new PV();
-        $pv->storePvlog($program,$employee,'新增被测件信息');
-
-        // $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
-        // if(sizeof($pvstates)!=0) {
-        //     foreach ($pvstates as $pvstate) {
-        //         $pvstate->is_read = 0;
-        //         $pvstate->save();
-        //     }
-        // }
-        // $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
-        //                           'change_note'=> '新增被测件信息'
-        // ));
-        // $program->Pvlog()->save($pvlog);
-
+        if($pv->isPVStateExist($program)){
+            $pv->storePvlog($program,$employee,'新增被测件信息');
+        }
 
 
         $softwareInfoCol=$program->SoftwareInfo;
@@ -124,7 +112,42 @@ class SoftwareInfoController extends Controller
      */
     public function show($id)
     {
-        //
+        $ret = array('success'=>0, 'note'=>null,'item'=>null,'isOkay'=>true );
+
+
+        $program=Program::find($id);
+        if($program==null){
+                $ret['isOkay']=false;
+                $ret['note']='无此项目';
+                return json_encode($ret);
+        }
+        $softwareInfo=$program->SoftwareInfo;
+        if(sizeof($softwareInfo)==0){
+                $ret['isOkay']=false;
+                $ret['note']='此项目无软件信息';
+                return json_encode($ret);
+        }
+        $softwareInfo=collect($softwareInfo[0]->toArray())->only([
+            'id',
+            'name',
+            'version_id',
+            'complier',
+            'runtime',
+            'size',
+            'reduced_code_size',
+            'reduced_reason',
+            'software_cate',
+            'software_sub_cate',
+            'cpu_type',
+            'code_langu',
+            'software_usage',
+            'software_type'])->all();
+      
+
+
+
+        $ret['item']=$softwareInfo;      
+        return json_encode($ret);
     }
 
     /**
@@ -135,7 +158,7 @@ class SoftwareInfoController extends Controller
      */
     public function edit($id)
     {
-        //
+
     }
 
     /**
@@ -147,48 +170,81 @@ class SoftwareInfoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null );
-
-
-        $softwareInfo=SoftwareInfo::find($id);
-        
-        $postData=$request->all();
-
-        $softwareInfo->name  = $postData['name'];
-        $softwareInfo->version_id= $postData['version_id'];
-        $softwareInfo->complier  = $postData['complier'];
-        $softwareInfo->runtime  = $postData['runtime'];
-        $softwareInfo->size     = $postData['size'];
-        $softwareInfo->reduced_code_size  = $postData['reduced_code_size'];
-        $softwareInfo->reduced_reason  = $postData['reduced_reason'];
-        $softwareInfo->software_cate = $postData['software_cate'];
-        $softwareInfo->software_sub_cate  = $postData['software_sub_cate'];
-        $softwareInfo->cpu_type  = $postData['cpu_type'];
-        $softwareInfo->code_langu  = $postData['code_langu'];
-        $softwareInfo->software_usage  = $postData['software_usage'];
-        $softwareInfo->software_type  = $postData['software_type'];        
-        $softwareInfo->save();
-
-        $program=$softwareInfo->Program;
+        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null ,'isOkay'=>true);
         $token = $request->header('AdminToken');
         $employee =Token::where('token',$token)->first()->Employee;
 
-        $pv = new PV();
-        $pv->storePvlog($program,$employee,'被测件信息变更');
 
-        // $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
-        // if(sizeof($pvstates)!=0) {
-        //     foreach ($pvstates as $pvstate) {
-        //         $pvstate->is_read = 0;
-        //         $pvstate->save();
-        //     }
-        // }
+        
+        $postData=$request->all();
+        if(array_key_exists('programId',$postData)&&$postData['programId']!=''){
+            $member=$postData['data'];
+            if(array_key_exists('id',$member)){
+                $softwareInfo=SoftwareInfo::find($member['id']);
+                $softwareInfo->name=$member['name'];
+                $softwareInfo->version_id=$member['version_id'];
+                $softwareInfo->complier=$member['complier'];
+                $softwareInfo->runtime=$member['runtime'];
+                $softwareInfo->size=$member['size'];
+                $softwareInfo->reduced_code_size=$member['reduced_code_size'];
+                $softwareInfo->reduced_reason=$member['reduced_reason'];
+                $softwareInfo->software_cate=$member['software_cate'];
+                $softwareInfo->software_sub_cate=$member['software_sub_cate'];
+                $softwareInfo->cpu_type=$member['cpu_type'];
+                $softwareInfo->code_langu=$member['code_langu'];
+                $softwareInfo->software_usage=$member['software_usage'];
+                $softwareInfo->software_type=$member['software_type'];
+                $softwareInfo->info_typer_id=$employee->id;
+                $softwareInfo->save();
+            }else {
+                $softwareInfo = new SoftwareInfo(array( 'name'      => $member['name'],
+                    'version_id'=> $member['version_id'],
+                    'complier'  => $member['complier'],
+                    'runtime'  => $member['runtime'],
+                    'size'     => $member['size'],
+                    'reduced_code_size'  => $member['reduced_code_size'],
+                    'reduced_reason'  => $member['reduced_reason'],
+                    'software_cate'  => $member['software_cate'],
+                    'software_sub_cate'  => $member['software_sub_cate'],
+                    'cpu_type'  => $member['cpu_type'],
+                    'code_langu'  => $member['code_langu'],
+                    'software_usage'  => $member['software_usage'],
+                    'software_type'  => $member['software_type'],
+                    'info_typer_id'   =>$employee->id
+                ));
+                $program->SoftwareInfo()->save($softwareInfo);
+            }
 
-        // $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
-        //                            'change_note'=> '被测件信息变更'
-        //                         ));
-        // $program->Pvlog()->save($pvlog);
 
+
+        }else{
+            $softwareInfo=SoftwareInfo::find($id);
+            $softwareInfo->name  = $postData['name'];
+            $softwareInfo->version_id= $postData['version_id'];
+            $softwareInfo->complier  = $postData['complier'];
+            $softwareInfo->runtime  = $postData['runtime'];
+            $softwareInfo->size     = $postData['size'];
+            $softwareInfo->reduced_code_size  = $postData['reduced_code_size'];
+            $softwareInfo->reduced_reason  = $postData['reduced_reason'];
+            $softwareInfo->software_cate = $postData['software_cate'];
+            $softwareInfo->software_sub_cate  = $postData['software_sub_cate'];
+            $softwareInfo->cpu_type  = $postData['cpu_type'];
+            $softwareInfo->code_langu  = $postData['code_langu'];
+            $softwareInfo->software_usage  = $postData['software_usage'];
+            $softwareInfo->software_type  = $postData['software_type'];        
+            $softwareInfo->save();
+
+            $program=$softwareInfo->Program;
+            $token = $request->header('AdminToken');
+            $employee =Token::where('token',$token)->first()->Employee;
+
+            $pv = new PV();
+            if($pv->isPVStateExist($program)){
+                $pv->storePvlog($program,$employee,'被测件信息变更');
+            }
+        }
+
+        
         return json_encode($ret);
     }
 

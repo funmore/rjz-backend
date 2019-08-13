@@ -53,7 +53,7 @@ class ProgramTeamRoleController extends Controller
      */
     public function store(Request $request)
     {
-        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null);
+        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null,'isOkay'=>true);
         $postData=$request->all();
         $program=Program::find($postData['programId']);
         $programTeamRoles=$postData['data'];
@@ -69,20 +69,11 @@ class ProgramTeamRoleController extends Controller
         $token = $request->header('AdminToken');
         $employee =Token::where('token',$token)->first()->Employee;
 
-        $pv = new PV();
-        $pv->storePvlog($program,$employee,'创建工作流程');
         
-        // $pvstates= Pvstate::where('program_id',$program->id)->where('employee_id','!=',$employee->id)->get();
-        // if(sizeof($pvstates)!=0) {
-        //     foreach ($pvstates as $pvstate) {
-        //         $pvstate->is_read = 0;
-        //         $pvstate->save();
-        //     }
-        // }
-        // $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
-        //                           'change_note'=> '创建工作流程'
-        // ));
-        // $program->Pvlog()->save($pvlog);
+        $pv = new PV();
+        if($pv->isPVStateExist($program)) {
+            $pv->storePvlog($program,$employee,'创建工作流程');
+        }
 
         $programTeamRoles=$program->ProgramTeamRole;
         $programTeamRoles=$programTeamRoles->map(function($programTeamRole){
@@ -109,7 +100,38 @@ class ProgramTeamRoleController extends Controller
      */
     public function show($id)
     {
-        //
+        $ret = array('success'=>0, 'note'=>null,'item'=>null,'isOkay'=>true );
+
+
+        $program=Program::find($id);
+        if($program==null){
+            $ret['isOkay']=false;
+            $ret['note']='无此项目';
+            return json_encode($ret);
+        }
+        $programTeamRole=$program->ProgramTeamRole;
+        if(sizeof($programTeamRole)==0){
+            $ret['isOkay']=false;
+            $ret['note']='此项目无项目组';
+            return json_encode($ret);
+        }
+        $programTeamRoles=null;
+        $programTeamRoles = $program->ProgramTeamRole;
+        $programTeamRoles = $programTeamRoles->map(function ($programTeamRole) {
+            return collect($programTeamRole->toArray())->only([
+                'id',
+                'role',
+                'workload_note',
+                'plan_workload',
+                'actual_workload',
+                'employee_id'])->put('employee_name', Employee::find($programTeamRole->employee_id)->name)->all();
+        });
+
+
+
+
+        $ret['item']=$programTeamRoles;
+        return json_encode($ret);
     }
 
     /**
@@ -132,17 +154,42 @@ class ProgramTeamRoleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null );
+        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null,'isOkay'=>true);
 
 
         $programTeamRole=ProgramTeamRole::find($id);
         
         $postData=$request->all();
+        if(array_key_exists('programId',$postData)&&$postData['programId']!=''){
+            $data=$postData['data'];
+            foreach($data as $member){
+                $memberRole=null;
+                if(array_key_exists('id',$member)){
+                    $memberRole=ProgramTeamRole::find($member['id']);
+                    $memberRole->role=$member['role'];
+                    $memberRole->workload_note=$member['workload_note'];
+                    $memberRole->plan_workload=$member['plan_workload'];
+                    $memberRole->actual_workload=$member['actual_workload'];
+                    $memberRole->employee_id=$member['employee_id'];
+                    $memberRole->save();
+                }else {
+                    $memberRole = new ProgramTeamRole(array('role' => $member['role'],
+                        'workload_note' => $member['workload_note'],
+                        'plan_workload' => $member['plan_workload'],
+                        'actual_workload' => $member['actual_workload'],
+                        'employee_id' => $member['employee_id']
+                    ));
+                    $program->ProgramTeamRole()->save($memberRole);
 
-        $programTeamRole->plan_workload  = $postData['plan_workload'];
-        $programTeamRole->workload_note= $postData['workload_note'];
-        $programTeamRole->actual_workload  = $postData['actual_workload'];      
-        $programTeamRole->save();
+                }
+            }
+
+        }else{
+            $programTeamRole->plan_workload  = $postData['plan_workload'];
+            $programTeamRole->workload_note= $postData['workload_note'];
+            $programTeamRole->actual_workload  = $postData['actual_workload'];      
+            $programTeamRole->save();
+        }
 
 
 

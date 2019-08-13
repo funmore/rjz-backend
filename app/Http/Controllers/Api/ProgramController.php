@@ -11,6 +11,7 @@ use App\Models\Pvlog;
 use App\Models\Pvstate;
 use App\Models\Token;
 use App\Libraries\PV;
+use App\Models\Employee;
 
 
 
@@ -55,7 +56,42 @@ class ProgramController extends Controller
      */
     public function show($id)
     {
-        //
+        $ret = array('success'=>0, 'note'=>null,'item'=>null,'isOkay'=>true );
+
+
+        $program=Program::find($id);
+        if($program==null){
+                $ret['isOkay']=false;
+                $ret['note']='无此项目';
+                return json_encode($ret);
+        }
+
+        $program=collect($program->toArray())->only([
+                'id',
+                'ref',
+                'type',
+                'program_source',
+                'state',
+                'overdue_reason',
+                'plan_start_time',
+                'plan_end_time',
+                'actual_start_time',
+                'actual_end_time',
+                'contract_id',
+                'workflow_id',
+                'name',
+                'program_identity',
+                'model_id',
+                'program_type',
+                'classification',
+                'program_stage',
+                'dev_type',
+                'manager_id'])->all();
+
+
+
+        $ret['item']=$program;      
+        return json_encode($ret);
     }
 
     /**

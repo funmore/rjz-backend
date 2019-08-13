@@ -11,6 +11,14 @@ class PV {
 
   }
 
+  public function isPVStateExist($program){
+    $pvstates= Pvstate::where('program_id',$program->id)->get();
+    if(sizeof($pvstates)!=0){
+        return true;
+    }else{
+        return false;
+    }
+  }
   //创建新项目使用
   public function storePvState($program,$employee){
         $programTeamRoles=$program->ProgramTeamRole;
@@ -85,6 +93,8 @@ class PV {
                 $pvstate->is_read = 0;
                 $pvstate->save();
             }
+        }else{
+            return;
         }
         
         $pvlog = new Pvlog(array( 'changer_id'      => $employee->id,
