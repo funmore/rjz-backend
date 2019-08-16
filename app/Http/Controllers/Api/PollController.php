@@ -14,6 +14,7 @@ use App\Models\UserInfo;
 use App\Models\Token;
 use App\Models\Employee;
 use Illuminate\Database\Eloquent\Collection;
+use Carbon\Carbon;
 
 class PollController extends Controller
 {
@@ -24,31 +25,52 @@ class PollController extends Controller
      */
     public function index(Request $request)
     {
-        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null );
+        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null ,'isOkay'=>true);
         $listQuery=$request->all();
         $token = $request->header('AdminToken');
         $employee =Token::where('token',$token)->first()->Employee;
+        $e_id=$employee->id;
 
-        $polls=Collection::make();
+        $polls=null;
 
-
-
-         if(filter_var($listQuery['isAll'], FILTER_VALIDATE_BOOLEAN)==true){
-             $pollsisAll = Poll::all();
-             $polls=$polls->merge($pollsisAll);
-         }
-
-//        if(filter_var($listQuery['isMeRelated'], FILTER_VALIDATE_BOOLEAN)==true){
-//            $pollsisMeCreated = poll::where('creator_id', $employee->id)->get();
-//            if($polls->isEmpty()){
-//                $polls=$polls->merge($pollsisMeCreated);
-//            }else{
-//                $polls=$polls->intersect($pollsisMeCreated);
-//            }
-//        }
-
-
-
+        if(!array_key_exists('type',$listQuery)){
+            $ret['isOkay']=false;
+            $ret['note']='未指定查询类型';
+            return json_encode($ret);
+        }
+        switch ($listQuery['type']) {
+            case 'canPoll':
+                $polls=Poll::where('due_day','>',Carbon::now())->get();
+                $polls=$polls->filter(function($poll)use($e_id){
+                    if(is_numeric(array_search($e_id,explode('|',$poll->range)))==true){  //poll 表中有此用户
+                        $pollFill=PollFill::where('poll_id',$poll->id)->where('employee_id',$e_id)->where('state','已填写')->get();  //pollfill 表里无此用户
+                        if(sizeof($pollFill)==0){
+                            return true;
+                        }
+                    }
+                   return  false;
+                });
+                break;
+            case 'isPolled':
+                $polls=Poll::where('due_day','>',Carbon::now())->get();
+                $polls=$polls->filter(function($poll)use($e_id){
+                    $pollFill=PollFill::where('poll_id',$poll->id)->where('employee_id',$e_id)->where('state','已填写')->get();
+                    if(sizeof($pollFill)!=0){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                });
+                break;
+            case 'processing':
+                $polls=Poll::where('due_day','>',Carbon::now())->where('employee_id',$e_id)->get();
+                break;
+            case 'expired':
+                $polls=Poll::where('due_day','<',Carbon::now())->where('employee_id',$e_id)->get();
+                break;
+            default:
+                ;
+        }
 
         //将polls按照创建时间的降序排列
         $polls=$polls->sortBy(function($poll)
