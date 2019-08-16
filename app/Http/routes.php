@@ -48,6 +48,7 @@ Route::group(['middleware' => ['weixin']], function () {
     Route::resource('/notestwork', 'Api\NoTestWorkController');
     Route::resource('/notestworklogmonth', 'Api\NoTestWorkController@month');
     Route::resource('/favor', 'Api\FavorController');
+    Route::resource('/Team', 'Api\TeamController');
 
 
     //workfow end
