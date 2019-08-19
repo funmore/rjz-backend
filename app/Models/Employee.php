@@ -41,6 +41,12 @@ class Employee extends Model
     public function Pvlog(){
         return $this->hasMany('App\Models\Pvlog','changer_id','id');
     }
+    public function PgFrom(){
+        return $this->hasMany('App\Models\PgFrom','from_id','id');
+    }
+    public function PgTo(){
+        return $this->hasMany('App\Models\PgTo','to_id','id');
+    }
     public function WorkflowNote(){
         return $this->hasMany('App\Models\WorkflowNote');
     }

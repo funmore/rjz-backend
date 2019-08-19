@@ -26,4 +26,11 @@ class Poll extends Model
     	return $this->belongsTo('App\Models\Employee','employee_id','id');
     }
 
+    public function PgFrom(){
+        return $this->hasMany('App\Models\PgFrom','item_id','id');
+    }
+    public function PgTo(){
+        return $this->hasMany('App\Models\PgTo','item_id','id');
+    }
+
 }

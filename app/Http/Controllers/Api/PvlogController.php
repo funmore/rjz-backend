@@ -37,38 +37,8 @@ class PvlogController extends Controller
 
         $token = $request->header('AdminToken');
         $employee  =Token::where('token', $token)->first()->Employee;
-        // $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
-        // $noDuplicates = array();
-        // foreach ($programTeamRoles as $v) {
-        //     if (isset($noDuplicates[$v['program_id']])) {
-        //         continue;
-        //     }
-        //     $noDuplicates[$v['program_id']] = $v;
-        // }
-        // $ProgramTeamRoleNoDuplicates = array_values($noDuplicates);
-        // $noticeArray=array();
-        // foreach($ProgramTeamRoleNoDuplicates as $member){
-        //     $program = $member->Program;
-        //     $pvstate =Pvstate::where('program_id',$program->id)->where('employee_id',$employee->id)->first();
-        //     if($pvstate==null) continue;
-        //     $is_read= $pvstate->is_read;
-        //     if($is_read==1) continue;
-        //     $pvlogs  = Pvlog::where('program_id',$program->id)
-        //                     ->where('changer_id','!=',$employee->id)
-        //                     ->where('updated_at','>=',$pvstate->updated_at)->get();
-        //     if(sizeof($pvlogs)==0) continue;
-
-        //     foreach ($pvlogs as $pvlog) {
-        //         $singlenotice['id']=$program->id;
-        //         $singlenotice['name']=$program->name;
-        //         $singlenotice['changer']=Employee::find($pvlog->changer_id)->name;
-        //         $singlenotice['change_note']=$pvlog->change_note;
-        //         array_push($noticeArray, $singlenotice);
-        //     }
-        // }
         $pv = new PV();
         $ret['noticeArray']=$pv->getPvlog($employee);
-        // $ret['noticeArray']=$noticeArray;
         return json_encode($ret);
 
     }

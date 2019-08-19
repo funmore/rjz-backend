@@ -53,16 +53,10 @@ Route::group(['middleware' => ['weixin']], function () {
 
     //workfow end
 
-    //Route::get('api/')
 
-
-    Route::get('/api/grant', 'Api\UserController@grant');
-    Route::get('/api/order', 'Api\OrderController@index');
-    Route::get('/api/order/create', 'Api\OrderController@create');
-    Route::get('/api/order/show', 'Api\OrderController@show');
 });
 
-Route::group(['middleware' => ['cors','wxlogin']], function () {
+Route::group(['middleware' => ['wxlogin']], function () {
     Route::get('/api/login', 'Api\UserController@login');
     Route::get('/api/logout', 'Api\UserController@logout');
 
