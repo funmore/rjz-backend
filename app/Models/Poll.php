@@ -12,7 +12,8 @@ class Poll extends Model
     protected $fillable = [ 'name',
                             'due_day',
                             'employee_id',
-                            'range'
+                            'range',
+                            'is_multiple'
                             ];
 
     public function PollColumn(){

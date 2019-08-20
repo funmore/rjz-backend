@@ -107,6 +107,12 @@ class PollFillController extends Controller
 
         $postData=$request->all();
 
+        $poll=Poll::find($postData['poll_id']);
+        if($poll==null){
+            $ret['is_okay']=false;
+            $ret['note']='此投票不存在';
+            return json_encode($ret);
+        }
         $poll_fill['poll_id'] = $postData['poll_id'];
         $poll_fill['state'] = '已填写';
         $poll_fill['employee_id']  = $employee->id;

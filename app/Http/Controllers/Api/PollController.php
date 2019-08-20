@@ -16,6 +16,7 @@ use App\Models\Employee;
 use Illuminate\Database\Eloquent\Collection;
 use Carbon\Carbon;
 
+
 class PollController extends Controller
 {
     /**
@@ -43,7 +44,7 @@ class PollController extends Controller
                 $polls=Poll::where('due_day','>',Carbon::now())->get();
                 $polls=$polls->filter(function($poll)use($e_id){
                     if(is_numeric(array_search($e_id,explode('|',$poll->range)))==true){  //poll 表中有此用户
-                        $pollFill=PollFill::where('poll_id',$poll->id)->where('employee_id',$e_id)->where('state','已填写')->get();  //pollfill 表里无此用户
+                        $pollFill=PollFill::where('poll_id',$poll->id)->where('employee_id',$e_id)->get();  //pollfill 表里无此用户
                         if(sizeof($pollFill)==0){
                             return true;
                         }
@@ -54,11 +55,19 @@ class PollController extends Controller
             case 'isPolled':
                 $polls=Poll::where('due_day','>',Carbon::now())->get();
                 $polls=$polls->filter(function($poll)use($e_id){
-                    $pollFill=PollFill::where('poll_id',$poll->id)->where('employee_id',$e_id)->where('state','已填写')->get();
+                    $pollFill=PollFill::where('poll_id',$poll->id)->where('employee_id',$e_id)->get();
                     if(sizeof($pollFill)!=0){
                         return true;
                     }else{
                         return false;
+                    }
+                });
+                break;
+            case 'isExpired':
+                $polls=Poll::where('due_day','<',Carbon::now())->get();
+                $polls=$polls->filter(function($poll)use($e_id){
+                    if(is_numeric(array_search($e_id,explode('|',$poll->range)))==true){  //poll 表中有此用户
+                        return true;
                     }
                 });
                 break;
@@ -87,6 +96,7 @@ class PollController extends Controller
                  'name',
                  'due_day',
                  'employee_id',
+                 'is_multiple',
                  'range'])
                  ->put('poll_fill_count',$pollFillsCount)
                  ->put('is_me_polled',$isMePolled)
@@ -129,6 +139,7 @@ class PollController extends Controller
         $poll['due_day']   = $RecPoll['due_day'];
         $poll['employee_id']  = $employee->id;
         $poll['range']  =implode("|", $RecPoll['range']);
+        $poll['is_multiple']   = $RecPoll['is_multiple'];
 
         $poll=Poll::create($poll);
         $poll->save();
@@ -153,7 +164,6 @@ class PollController extends Controller
      */
     public function show($id)
     {
-
         $ret = array('success'=>0, 'note'=>null,'items'=>null,'is_leader'=>false );
 
         $poll = Poll::find($id);
@@ -182,6 +192,43 @@ class PollController extends Controller
 
 
         return json_encode($ret);
+
+    }
+    
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function showUnPollPeople($id)
+    {
+
+        $ret = array('success'=>0, 'note'=>null,'items'=>array(),'is_leader'=>false );
+
+        $poll = Poll::find($id);
+        $items=Collection::make();
+        $employeIdCol=explode('|',$poll->range);
+        foreach($employeIdCol as $employeId){
+            $items->push(array('employee_name'=>Employee::find($employeId)->name,'count'=>sizeof(PollFill::where('poll_id',$poll->id)->where('employee_id',$employeId)->get())));
+            // $item=array('employee_name'=>Employee::find($employeId)->name,'count'=>sizeof(PollFill::where('poll_id',$poll->id)->where('employee_id',$employeId)->get()));
+            // array_push($ret['items'],$item);
+        }
+        $items=$items->values()->sortBy(function($item){
+            $item['count'];
+        })->reverse();
+        $ret['items']=$items;
+        // ->sortBy(function($program)
+        // {
+        //     return $program->created_at;
+        // })
+
+        
+        
+
+        return json_encode($ret);
+
+        
     }
 
     /**
