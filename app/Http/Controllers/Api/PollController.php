@@ -210,18 +210,13 @@ class PollController extends Controller
         $items=Collection::make();
         $employeIdCol=explode('|',$poll->range);
         foreach($employeIdCol as $employeId){
-            $items->push(array('employee_name'=>Employee::find($employeId)->name,'count'=>sizeof(PollFill::where('poll_id',$poll->id)->where('employee_id',$employeId)->get())));
-            // $item=array('employee_name'=>Employee::find($employeId)->name,'count'=>sizeof(PollFill::where('poll_id',$poll->id)->where('employee_id',$employeId)->get()));
-            // array_push($ret['items'],$item);
+            $employee_name=Employee::find($employeId)!=null?Employee::find($employeId)->name:null;
+            $items->push(array('employee_name'=>$employee_name,'count'=>sizeof(PollFill::where('poll_id',$poll->id)->where('employee_id',$employeId)->get())));
         }
         $items=$items->values()->sortBy(function($item){
             $item['count'];
         })->reverse();
         $ret['items']=$items;
-        // ->sortBy(function($program)
-        // {
-        //     return $program->created_at;
-        // })
 
         
         
