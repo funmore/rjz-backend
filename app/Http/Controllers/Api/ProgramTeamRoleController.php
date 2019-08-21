@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Libraries\PV;
 
 
+
 class ProgramTeamRoleController extends Controller
 {
     /**
@@ -77,13 +78,14 @@ class ProgramTeamRoleController extends Controller
 
         $programTeamRoles=$program->ProgramTeamRole;
         $programTeamRoles=$programTeamRoles->map(function($programTeamRole){
+            $employee_name=Employee::find($programTeamRole->employee_id)!=null?Employee::find($programTeamRole->employee_id)->name:null;
             return collect($programTeamRole->toArray())->only([
                 'id',
                 'role',
                 'workload_note',
                 'plan_workload',
                 'actual_workload',
-                'employee_id'])->put('employee_name',Employee::find($programTeamRole->employee_id)->name)->all();
+                'employee_id'])->put('employee_name',$employee_name)->all();
         });
 
 
@@ -118,13 +120,14 @@ class ProgramTeamRoleController extends Controller
         $programTeamRoles=null;
         $programTeamRoles = $program->ProgramTeamRole;
         $programTeamRoles = $programTeamRoles->map(function ($programTeamRole) {
+            $employee_name=Employee::find($programTeamRole->employee_id)!=null?Employee::find($programTeamRole->employee_id)->name:null;
             return collect($programTeamRole->toArray())->only([
                 'id',
                 'role',
                 'workload_note',
                 'plan_workload',
                 'actual_workload',
-                'employee_id'])->put('employee_name', Employee::find($programTeamRole->employee_id)->name)->all();
+                'employee_id'])->put('employee_name', $employee_name)->all();
         });
 
 
@@ -161,6 +164,21 @@ class ProgramTeamRoleController extends Controller
         
         $postData=$request->all();
         if(array_key_exists('programId',$postData)&&$postData['programId']!=''){
+
+            //删除不在postData中的人员 start
+            $program=Program::find($postData['programId']);
+            if($program!=null&&sizeof($program->ProgramTeamRole)!=0&&sizeof($postData['data'])!=0) {
+                    $postDataIdCol = Collection::make($postData['data'])->values()->pluck('id');
+                    $ProgramTeamRoleForDelete=$program->ProgramTeamRole->filter(function($item)use($postDataIdCol){
+                        return !is_numeric($postDataIdCol->search($item->id));
+                    });
+                    foreach($ProgramTeamRoleForDelete as $item){
+                        $item->delete();
+                }
+            }
+            //删除不在postData中的人员 end
+
+
             $data=$postData['data'];
             foreach($data as $member){
                 $memberRole=null;

@@ -666,8 +666,17 @@ class ProgramEditController extends Controller
 
 
         //将programs按照创建时间的降序排列
-        $programs=$programs->filter(function($program){
-          return $program->state=='正式项目';
+        $programs=$programs->filter(function($program)use($listQuery){
+            if(array_key_exists('state',$listQuery)&&$listQuery['state']!=''){
+                if($listQuery['state']=='全部项目'){
+                    return true;
+                }else{
+                    return $program->state==$listQuery['state'];
+                }
+            }else{
+                return true;
+            }
+          
         })->sortBy(function($program)
         {
             return $program->created_at;
