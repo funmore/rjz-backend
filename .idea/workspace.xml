@@ -8,7 +8,9 @@
   <component name="ChangeListManager">
     <list default="true" id="54360d32-5dfc-4697-830e-be237aed1442" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/ProgramTeamRoleController.php" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/ProgramTeamRoleController.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/ProgramController.php" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/ProgramController.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/ProgramEditController.php" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/ProgramEditController.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/Http/routes.php" afterPath="$PROJECT_DIR$/app/Http/routes.php" />
     </list>
     <ignored path="laravel.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -31,26 +33,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="index.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/public/index.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="53" column="54" lean-forward="false" selection-start-line="53" selection-start-column="54" selection-end-line="53" selection-end-column="54" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CorsMiddleware.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/Http/Middleware/CorsMiddleware.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="510">
-              <caret line="34" column="40" lean-forward="false" selection-start-line="34" selection-start-column="40" selection-end-line="34" selection-end-column="40" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Kernel.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/Http/Kernel.php">
           <provider selected="true" editor-type-id="text-editor">
@@ -61,22 +43,15 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="WxloginMiddleware.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/Http/Middleware/WxloginMiddleware.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="25" column="0" lean-forward="false" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="routes.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/Http/routes.php">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="150">
               <caret line="19" column="31" lean-forward="false" selection-start-line="19" selection-start-column="31" selection-end-line="19" selection-end-column="31" />
-              <folding />
+              <folding>
+                <marker date="1566901003000" expanded="true" signature="545:2586" ph="..." />
+                <marker date="1566901003000" expanded="true" signature="588:2585" ph="..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -84,10 +59,11 @@
       <file leaf-file-name="PollController.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/Http/Controllers/Api/PollController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="632">
-              <caret line="217" column="0" lean-forward="false" selection-start-line="217" selection-start-column="0" selection-end-line="217" selection-end-column="0" />
+            <state relative-caret-position="3060">
+              <caret line="216" column="0" lean-forward="false" selection-start-line="216" selection-start-column="0" selection-end-line="216" selection-end-column="0" />
               <folding>
                 <element signature="e#44#72#0#PHP" expanded="true" />
+                <marker date="1566370502000" expanded="true" signature="6823:6837" ph="..." />
               </folding>
             </state>
           </provider>
@@ -96,21 +72,51 @@
       <file leaf-file-name="ProgramTeamRoleTaskController.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramTeamRoleTaskController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2107">
+            <state relative-caret-position="540">
               <caret line="48" column="17" lean-forward="false" selection-start-line="48" selection-start-column="17" selection-end-line="48" selection-end-column="17" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ProgramTeamRoleController.php" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ProgramTeamRoleController.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramTeamRoleController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="392">
+            <state relative-caret-position="2430">
               <caret line="180" column="0" lean-forward="false" selection-start-line="180" selection-start-column="0" selection-end-line="180" selection-end-column="0" />
               <folding>
                 <element signature="e#44#72#0#PHP" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ProgramEditController.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramEditController.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="3074">
+              <caret line="705" column="46" lean-forward="false" selection-start-line="705" selection-start-column="46" selection-end-line="705" selection-end-column="46" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ProgramController.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramController.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="546">
+              <caret line="131" column="0" lean-forward="false" selection-start-line="131" selection-start-column="0" selection-end-line="131" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Router.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Routing/Router.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="366">
+              <caret line="1210" column="5" lean-forward="true" selection-start-line="1210" selection-start-column="5" selection-end-line="1210" selection-end-column="5" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -227,7 +233,6 @@
         <option value="$PROJECT_DIR$/app/Http/Controllers/Api/FavorController.php" />
         <option value="$PROJECT_DIR$/app/Libraries/PERMISSION.php" />
         <option value="$PROJECT_DIR$/app/Http/Controllers/Api/ContactController.php" />
-        <option value="$PROJECT_DIR$/app/Http/Controllers/Api/ProgramEditController.php" />
         <option value="$PROJECT_DIR$/app/Http/Controllers/Api/SoftwareInfoController.php" />
         <option value="$PROJECT_DIR$/app/Http/Controllers/Api/WorkflowController.php" />
         <option value="$PROJECT_DIR$/app/Http/Middleware/CorsMiddleware.php" />
@@ -235,6 +240,7 @@
         <option value="$PROJECT_DIR$/app/Http/routes.php" />
         <option value="$PROJECT_DIR$/app/Http/Controllers/Api/PollController.php" />
         <option value="$PROJECT_DIR$/app/Http/Controllers/Api/ProgramTeamRoleController.php" />
+        <option value="$PROJECT_DIR$/app/Http/Controllers/Api/ProgramEditController.php" />
       </list>
     </option>
   </component>
@@ -372,7 +378,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -434,6 +439,7 @@
         </subPane>
       </pane>
       <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -636,11 +642,13 @@
       <workItem from="1566181830401" duration="2659000" />
       <workItem from="1566215290439" duration="160000" />
       <workItem from="1566359041378" duration="1933000" />
+      <workItem from="1566371469343" duration="84000" />
+      <workItem from="1566961006095" duration="160000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="421771000" />
+    <option name="totallyTimeSpent" value="422015000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -656,7 +664,7 @@
     <editor active="true" />
     <layout>
       <window_info id="Gulp" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2662407" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2715655" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32914045" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1446541" sideWeight="0.50671554" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -873,11 +881,36 @@
           <line>35</line>
           <option name="timeStamp" value="1720" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramController.php</url>
+          <line>122</line>
+          <option name="timeStamp" value="1729" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramController.php</url>
+          <line>126</line>
+          <option name="timeStamp" value="1730" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramController.php</url>
+          <line>128</line>
+          <option name="timeStamp" value="1732" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramController.php</url>
+          <line>129</line>
+          <option name="timeStamp" value="1733" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramController.php</url>
+          <line>134</line>
+          <option name="timeStamp" value="1734" />
+        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="1729" />
+      <option name="time" value="1735" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="index.php">
@@ -1182,20 +1215,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Routing/Router.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="591">
-          <caret line="1225" column="0" lean-forward="false" selection-start-line="1225" selection-start-column="0" selection-end-line="1225" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="66">
-          <caret line="144" column="9" lean-forward="false" selection-start-line="144" selection-start-column="9" selection-end-line="144" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/Models/ProgramTeamRoleTask.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1304,16 +1323,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramEditController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="1397" column="0" lean-forward="false" selection-start-line="1381" selection-start-column="11" selection-end-line="1397" selection-end-column="0" />
-          <folding>
-            <marker date="1565456196000" expanded="true" signature="10520:10530" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/Http/Controllers/Api/WorkflowController.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2895">
@@ -1334,9 +1343,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/public/index.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
+        <state relative-caret-position="720">
           <caret line="53" column="54" lean-forward="false" selection-start-line="53" selection-start-column="54" selection-end-line="53" selection-end-column="54" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1376,7 +1384,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
           <caret line="19" column="31" lean-forward="false" selection-start-line="19" selection-start-column="31" selection-end-line="19" selection-end-column="31" />
-          <folding />
+          <folding>
+            <marker date="1566901003000" expanded="true" signature="545:2586" ph="..." />
+            <marker date="1566901003000" expanded="true" signature="588:2585" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1390,10 +1401,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/Http/Controllers/Api/PollController.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="632">
-          <caret line="217" column="0" lean-forward="false" selection-start-line="217" selection-start-column="0" selection-end-line="217" selection-end-column="0" />
+        <state relative-caret-position="3060">
+          <caret line="216" column="0" lean-forward="false" selection-start-line="216" selection-start-column="0" selection-end-line="216" selection-end-column="0" />
           <folding>
             <element signature="e#44#72#0#PHP" expanded="true" />
+            <marker date="1566370502000" expanded="true" signature="6823:6837" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1408,7 +1420,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramTeamRoleTaskController.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2107">
+        <state relative-caret-position="540">
           <caret line="48" column="17" lean-forward="false" selection-start-line="48" selection-start-column="17" selection-end-line="48" selection-end-column="17" />
           <folding />
         </state>
@@ -1416,11 +1428,35 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramTeamRoleController.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="392">
+        <state relative-caret-position="2430">
           <caret line="180" column="0" lean-forward="false" selection-start-line="180" selection-start-column="0" selection-end-line="180" selection-end-column="0" />
           <folding>
             <element signature="e#44#72#0#PHP" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramEditController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3074">
+          <caret line="705" column="46" lean-forward="false" selection-start-line="705" selection-start-column="46" selection-end-line="705" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/Http/Controllers/Api/ProgramController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="546">
+          <caret line="131" column="0" lean-forward="false" selection-start-line="131" selection-start-column="0" selection-end-line="131" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Routing/Router.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="366">
+          <caret line="1210" column="5" lean-forward="true" selection-start-line="1210" selection-start-column="5" selection-end-line="1210" selection-end-column="5" />
+          <folding />
         </state>
       </provider>
     </entry>

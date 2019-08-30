@@ -12,6 +12,8 @@ use App\Models\Pvstate;
 use App\Models\Token;
 use App\Libraries\PV;
 use App\Models\Employee;
+use App\Models\ProgramTeamRole;
+use App\Models\FlightModel;
 
 
 
@@ -45,7 +47,67 @@ class ProgramController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $token = $request->header('AdminToken');
+        $employee =Token::where('token',$token)->first()->Employee;
+
+        $ret = array('success'=>0, 'note'=>null,'total'=>0,'item'=>null,'isOkay'=>true);
+        $postData=$request->all();
+
+        $programBasic=$postData['data'];
+        $program['plan_start_time'] = $programBasic['plan_start_time'];
+        $program['plan_end_time']   = $programBasic['plan_end_time'];
+        $program['name']            = $programBasic['name'];
+        $program['type']            = $programBasic['type'];
+        $program['ref']             = $programBasic['ref'];
+        $program['program_source']  = $programBasic['program_source'];
+        $program['state']           = $programBasic['state'];
+        $program['program_identity']= $programBasic['program_identity'];
+        $program['model_id']        = $programBasic['model_id'];
+        $program['program_type']    = $programBasic['program_type'];
+        $program['classification']  = $programBasic['classification'];
+        $program['program_stage']   = $programBasic['program_stage'];
+        $program['dev_type']        = $programBasic['dev_type'];
+        $program['creator_id']      = $employee->id;
+        $program['manager_id']      = FlightModel::find($programBasic['model_id'])->employee_id;
+
+        $program=Program::create($program);
+        $program->save();
+
+
+        
+        $pv = new PV();
+        if($pv->isPVStateExist($program)) {
+            $pv->storePvlog($program,$employee,'创建项目');
+        }
+
+
+        $manager=$program->FlightModel==null?null:Employee::find($program->FlightModel->employee_id);
+        $program=collect($program->toArray())->only([
+                'id',
+                'overdue_reason',
+                'plan_start_time',
+                'plan_end_time',
+                'actual_start_time',
+                'actual_end_time',
+                'contract_id',
+                'workflow_id',
+                'name',
+                'program_identity',
+                'model_id',
+                'program_type',
+                'classification',
+                'program_stage',
+                'dev_type',
+                'state',
+                'creator_id',
+                'note'])
+                ->put('manager',$manager)
+                ->all();
+
+
+        $ret['item']=$program;
+        return json_encode($ret);
+
     }
 
     /**
@@ -58,7 +120,11 @@ class ProgramController extends Controller
     {
         $ret = array('success'=>0, 'note'=>null,'item'=>null,'isOkay'=>true );
 
-
+        if($id==null){
+                $ret['isOkay']=false;
+                $ret['note']='无此项目';
+                return json_encode($ret);  
+        }
         $program=Program::find($id);
         if($program==null){
                 $ret['isOkay']=false;
@@ -92,6 +158,50 @@ class ProgramController extends Controller
 
         $ret['item']=$program;      
         return json_encode($ret);
+    }
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function role($id,Request $request)
+    {
+        $token = $request->header('AdminToken');
+        $employee =Token::where('token',$token)->first()->Employee;
+
+        $ret = array('success'=>0, 'note'=>null,'program_role'=>null,'isOkay'=>true );
+
+        $program = Program::find($id);
+        if($program==null){
+                $ret['note']="项目不存在";
+                $ret['isOkay']=false;
+                return json_encode($ret);
+        }
+
+        $programRole=array();
+        if(sizeof($program->ProgramTeamRole)!=0){
+        $programTeamRolesForRoleAdd=$program->ProgramTeamRole;
+        foreach($programTeamRolesForRoleAdd as $one){
+                if($one->employee_id==$employee->id) {
+                array_push($programRole, $one->role);
+                }
+        }
+        }
+        if($program->FlightModel->Employee->id==$employee->id){
+        array_push($programRole, '型号负责人');
+        }
+        if(sizeof($programRole)==0){
+        array_push($programRole, '只读');
+        }
+        $ret['program_role']=$programRole;
+
+
+
+
+        return json_encode($ret);
+
+
     }
 
     /**

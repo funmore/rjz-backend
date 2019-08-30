@@ -23,17 +23,22 @@ class FavorController extends Controller
      */
     public function index(Request $request)
     {
-        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null );
+        $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null,'isOkay'=>true );
         $listQuery=$request->all();
         $token = $request->header('AdminToken');
         $employee =Token::where('token',$token)->first()->Employee;
         
         $favors=Collection::make();
 
-        $favors=Favor::where('system',"是")->get();
+        
         if(array_key_exists('type',$listQuery)&&$listQuery['type']!=''){
-            $favorsPersonal=Favor::where('employee_id',$employee->id)->where('type',$listQuery['type'])->get();
+            $favors=Favor::where('type',$listQuery['type'])->where('system',"是")->get();
+            $favorsPersonal=Favor::where('type',$listQuery['type'])->where('employee_id',$employee->id)->get();
             $favors=$favors->merge($favorsPersonal);
+        }else{
+            $ret['note']='未指定类型';
+            $ret['isOkay']=false;
+            return json_encode($ret);
         }
         if(sizeof($favors)==0) {
             return json_encode($ret);
@@ -76,7 +81,15 @@ class FavorController extends Controller
         $token = $request->header('AdminToken');
         $employee =Token::where('token',$token)->first()->Employee;
         $postData=$request->all();
-
+        if($postData['default']=='是'){
+            $favorsPersonals=Favor::where('type',$postData['type'])->where('employee_id',$employee->id)->where('default','是')->get();
+            if(sizeof($favorsPersonals)!=0){
+                foreach($favorsPersonals as $one){
+                    $one->default='否';
+                    $one->save();
+                }
+            }
+        }
         $favor['employee_id']=$employee->id;
         $favor['type'] = $postData['type'];
         $favor['value']   = $postData['value'];
@@ -86,6 +99,8 @@ class FavorController extends Controller
 
         $favor=Favor::create($favor);
         $favor->save();
+
+        
 
         $ret['id']=$favor->id;
         $ret['created_at']=$favor->created_at;
@@ -126,7 +141,15 @@ class FavorController extends Controller
         $ret = array('success'=>0, 'note'=>null,'total'=>0,'items'=>null );
 
         $postData=$request->all();
-
+        if($postData['default']=='是'){
+            $favorsPersonals=Favor::where('type',$postData['type'])->where('employee_id',$employee->id)->where('default','是')->get();
+            if(sizeof($favorsPersonals)!=0){
+                foreach($favorsPersonals as $one){
+                    $one->default='否';
+                    $one->save();
+                }
+            }
+        }
         $favor=Favor::find($id);
         $favor['default'] = $postData['default'];
         $favor['alias'] = $postData['alias'];

@@ -515,8 +515,18 @@ class ProgramEditController extends Controller
                 $programs=$programs->intersect($programsManager);
             }
         }
-        if(array_key_exists('type',$listQuery)&&$listQuery['type']!=''){
-            if($listQuery['type']=='creator'){
+        if(array_key_exists('role',$listQuery)&&$listQuery['role']!=''){
+
+            if($listQuery['role']=='型号负责人'){
+                $programsisMeCreated = Program::where('manager_id', $employee->id)->get();
+                if($programs->isEmpty()){
+                    $programs=$programs->merge($programsisMeCreated);
+                }else{
+                    $programs=$programs->intersect($programsisMeCreated);
+                }
+            }
+
+            if($listQuery['role']=='项目创建人'){
                 $programsisMeCreated = Program::where('creator_id', $employee->id)->get();
                 if($programs->isEmpty()){
                     $programs=$programs->merge($programsisMeCreated);
@@ -526,7 +536,7 @@ class ProgramEditController extends Controller
             }
 
 
-            if($listQuery['type']=='member'){
+            if($listQuery['role']=='项目组员'){
                 $programsisMeMember=Collection::make();
             $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
             $noDuplicates = array();
@@ -553,7 +563,7 @@ class ProgramEditController extends Controller
             }
 
 
-            if($listQuery['type']=='leader'){
+            if($listQuery['role']=='项目组长'){
                 $programsisMeMember=Collection::make();
                 $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
                 $noDuplicates = array();
@@ -580,7 +590,7 @@ class ProgramEditController extends Controller
                     $programs=$programs->intersect($programsisMeMember);
                 }
             }
-            if($listQuery['type']=='supervisor'){
+            if($listQuery['role']=='监督人员'){
                 $programsisMeMember=Collection::make();
                 $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
                 $noDuplicates = array();
@@ -607,7 +617,7 @@ class ProgramEditController extends Controller
                     $programs=$programs->intersect($programsisMeMember);
                 }
             }
-            if($listQuery['type']=='qa'){
+            if($listQuery['role']=='质量保证员'){
                 $programsisMeMember=Collection::make();
                 $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
                 $noDuplicates = array();
@@ -634,7 +644,7 @@ class ProgramEditController extends Controller
                     $programs=$programs->intersect($programsisMeMember);
                 }
             }
-            if($listQuery['type']=='cm'){
+            if($listQuery['role']=='配置管理员'){
                 $programsisMeMember=Collection::make();
                 $programTeamRoles=ProgramTeamRole::where('employee_id',$employee->id)->get();
                 $noDuplicates = array();
@@ -690,7 +700,20 @@ class ProgramEditController extends Controller
 
 
 
-         $programsToArray=$programs->map(function($program){
+            $programsToArray=$programs->map(function($program){
+                $is_exist=array('ProgramBasic'=>true,'Contact'=>false,'SoftwareInfo'=>false,'Workflow'=>false,'ProgramTeamRole'=>false);
+                if(sizeof($program->Contact)!=0){
+                    $is_exist['Contact']=true;
+                }
+                if(sizeof($program->SoftwareInfo)!=0){
+                    $is_exist['SoftwareInfo']=true;
+                }
+                if($program->Workflow!=null){
+                    $is_exist['Workflow']=true;
+                }
+                if(sizeof($program->ProgramTeamRole)!=0){
+                    $is_exist['ProgramTeamRole']=true;
+                }
 
             $manager=$program->FlightModel==null?'':Employee::find($program->FlightModel->employee_id);
             $manager_name=$manager->name;
@@ -713,7 +736,8 @@ class ProgramEditController extends Controller
                 'dev_type',
                 'state',
                 'creator_id',
-                'manager_id'])
+                'manager_id',
+                 'note'])
                 ->put('model_name',$model_name)
                 ->put('manager_name',$manager_name)
                 ->put('manager',$manager)
@@ -792,12 +816,25 @@ class ProgramEditController extends Controller
                  $program_team_strict=$programTeamStrictName;
                  $programTeamRole=array('program_leader'=>$program_leader,'program_team_strict'=>$program_team_strict);
              }
-        
+             $is_exist=array('ProgramBasic'=>true,'Contact'=>false,'SoftwareInfo'=>false,'Workflow'=>false,'ProgramTeamRole'=>false);
+                if(sizeof($program->Contact)!=0){
+                    $is_exist['Contact']=true;
+                }
+                if(sizeof($program->SoftwareInfo)!=0){
+                    $is_exist['SoftwareInfo']=true;
+                }
+                if($program->Workflow!=null){
+                    $is_exist['Workflow']=true;
+                }
+                if(sizeof($program->ProgramTeamRole)!=0){
+                    $is_exist['ProgramTeamRole']=true;
+                }
             $item=array('programBasic'=>$programBasic,
                         'contact'=>$contact,
                         'softwareInfoCol'=>$softwareInfoCol,
                         'workflow'=>$workflow,
-                        'programTeamRole'=>$programTeamRole);
+                        'programTeamRole'=>$programTeamRole,
+                        'is_exist'=>$is_exist);
              return $item;
          });
 

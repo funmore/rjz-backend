@@ -31,6 +31,7 @@ Route::group(['middleware' => ['weixin']], function () {
     Route::resource('/programteamrole', 'Api\ProgramTeamRoleController');
     Route::resource('/programteamroletask', 'Api\ProgramTeamRoleTaskController');
     Route::resource('/program', 'Api\ProgramController');
+    Route::resource('/program/role', 'Api\ProgramController@role');
     Route::resource('/pvlog', 'Api\PvlogController');
     Route::resource('/workflow', 'Api\WorkflowController');
     Route::resource('/workflownote', 'Api\WorkflowNoteController');
