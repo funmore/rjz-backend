@@ -307,7 +307,7 @@ class ProgramEditController extends Controller
                         $programTeamStrict = $program->ProgramTeamRole->filter(function ($value) {
                             return $value->role == '项目组长' || $value->role == '项目组员';
                         })->map(function ($item) {
-                            return Employee::find($item->employee_id)->name;
+                            return Employee::find($item->employee_id)!=null?Employee::find($item->employee_id)->name:null;
                         })->all();
                         $programTeamStrictName = implode('/', $programTeamStrict);
     

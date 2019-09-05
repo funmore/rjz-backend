@@ -60,7 +60,7 @@ class ProgramController extends Controller
         $program['type']            = $programBasic['type'];
         $program['ref']             = $programBasic['ref'];
         $program['program_source']  = $programBasic['program_source'];
-        $program['state']           = $programBasic['state'];
+        $program['state']           = '意向项目';
         $program['program_identity']= $programBasic['program_identity'];
         $program['model_id']        = $programBasic['model_id'];
         $program['program_type']    = $programBasic['program_type'];
